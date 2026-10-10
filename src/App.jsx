@@ -16,6 +16,7 @@ import PhoneCamera from './pages/PhoneCamera';
 import MobileScanner from './pages/MobileScanner';
 import CircuitDiagramAR from './pages/CircuitDiagramAR';
 import HardwareMonitor from './pages/HardwareMonitor';
+import ClipperClamperLab from './pages/ClipperClamperLab';
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
                 <Route path="/motor-trainer" element={<CircuitDiagramAR />} />
                 <Route path="/hardware-monitor" element={<HardwareMonitor />} />
                 <Route path="/dc-motor-monitor" element={<HardwareMonitor />} />
+                <Route path="/clipper-clamper-lab" element={<ClipperClamperLab />} />
                 <Route path="/analysis" element={<Analysis />} />
                 <Route path="/simulator" element={<Simulator />} />
                 <Route path="/calculator" element={<Calculator />} />

@@ -25,6 +25,13 @@ export default function Home() {
       badge: 'Live AR & Hardware'
     },
     {
+      title: 'Clipper & Clamper Lab',
+      desc: 'Interactive positive/negative diode clippers and clampers with real-time dual-trace scope.',
+      icon: Activity,
+      link: '/clipper-clamper-lab',
+      badge: 'Diode Wave-Shaping'
+    },
+    {
       title: 'Breadboard Scanner',
       desc: 'Capture or upload breadboard images for instant netlist identification.',
       icon: Scan,

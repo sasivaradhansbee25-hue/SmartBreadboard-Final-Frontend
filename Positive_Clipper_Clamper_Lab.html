@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Positive Clipper &amp; Clamper — Interactive Lab</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23101a1c'/%3E%3Cpath d='M5 20 Q10 6 15 14 L27 14' stroke='%2333e1a6' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef0ea; --surface:#f8f9f5; --surface-2:#e4e7df; --ink:#1b2422; --muted:#5d6966; --faint:#8e9894;
+  --line:#cfd4ca; --accent:#0e7c66; --accent-soft:#d3ebe3; --warn:#b4541a;
+  --scope:#0b1413; --scope-grid:#1d2f2c; --scope-axis:#2f4a45; --ch1:#f2c94c; --ch2:#33e1a6;
+  --wire:#3b4442; --copper:#b8703a;
+  --radius:14px;
+  --font:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.55;font-size:16px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+header.top .wrap{display:flex;align-items:center;gap:14px;padding-top:14px;padding-bottom:14px}
+header.top .brand{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:-.01em}
+header.top nav{margin-left:auto;display:flex;gap:6px}
+header.top nav a{font-size:14px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:999px}
+header.top nav a:hover{background:var(--surface-2);color:var(--ink)}
+.hero{padding:56px 0 28px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.hero h1{font-size:clamp(30px,4.2vw,50px);line-height:1.08;letter-spacing:-.025em;margin:10px 0 14px;max-width:820px}
+.hero p{color:var(--muted);max-width:680px;font-size:17px}
+section.lab{padding:28px 0 44px}
+.lab-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.lab-head h2{font-size:28px;letter-spacing:-.02em}
+.tag{font-family:var(--mono);font-size:12px;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.lab-head p{color:var(--muted);flex-basis:100%;max-width:760px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.bench{padding:10px;overflow-x:auto}
+.bench svg{width:100%;min-width:680px;height:auto;display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+@media (max-width:920px){.grid2{grid-template-columns:1fr}}
+.controls{padding:20px 22px}
+.controls h3,.scope-card h3,.theory h3{font-size:13px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:500;margin-bottom:14px}
+.ctl{display:grid;grid-template-columns:150px 1fr 78px;align-items:center;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.ctl:last-of-type{border-bottom:none}
+.ctl label{font-size:14px;font-weight:500}
+.ctl output{font-family:var(--mono);font-size:13px;text-align:right;color:var(--accent);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:999px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;font:500 13px var(--font);color:var(--muted);padding:6px 12px;border-radius:999px;cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.ctl.wide{grid-template-columns:150px 1fr}
+.scope-card{padding:18px;background:#121c1b;border-color:#24312f;color:#c9d6d2}
+.scope-card h3{color:#7f9893}
+.scope-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap}
+.legend{display:flex;gap:14px;font-family:var(--mono);font-size:12px}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:16px;height:3px;border-radius:2px;display:inline-block}
+canvas.scope{width:100%;height:320px;display:block;border-radius:10px;background:var(--scope)}
+.readouts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.readouts div{background:#0b1413;border:1px solid #213230;border-radius:8px;padding:8px 10px}
+.readouts small{display:block;font-family:var(--mono);font-size:10.5px;color:#6f8a85;text-transform:uppercase;letter-spacing:.08em}
+.readouts b{font-family:var(--mono);font-size:15px;color:#e8f1ee;font-weight:500}
+@media (max-width:560px){.readouts{grid-template-columns:repeat(2,1fr)}.ctl{grid-template-columns:110px 1fr 64px}.ctl.wide{grid-template-columns:1fr}}
+.status{font-family:var(--mono);font-size:12px;padding:3px 10px;border-radius:999px;background:#1d2b29;color:#8aa6a0}
+.status.on{background:#3d2d0b;color:#ffcc55}
+.theory{padding:20px 22px}
+.theory ol{padding-left:20px;color:var(--ink)}
+.theory li{margin:6px 0;font-size:15px}
+.eq{font-family:var(--mono);background:var(--surface-2);border-radius:8px;padding:10px 12px;margin:12px 0;font-size:14px}
+.note{font-size:13.5px;color:var(--warn);margin-top:10px;min-height:20px}
+.parts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.parts span{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:6px;padding:4px 8px;color:var(--muted)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px;width:fit-content;margin-bottom:8px;position:sticky;top:10px;z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.tabs button{border:0;background:transparent;font:600 15px var(--font);color:var(--muted);padding:10px 20px;border-radius:999px;cursor:pointer}
+.tabs button:hover{color:var(--ink)}
+.tabs button.on{background:var(--accent);color:#fff}
+[hidden]{display:none!important}
+@media (max-width:560px){.tabs{border-radius:16px;width:100%}.tabs button{flex:1 1 45%;padding:9px 10px;font-size:14px}}
+footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--faint);font-size:13px}
+/* SVG component styles */
+.wire{stroke:var(--wire);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.lead{stroke:#9aa3a0;stroke-width:2.5;fill:none;stroke-linecap:round}
+.lbl{font-family:var(--mono);font-size:13px;fill:var(--ink)}
+.lbl-s{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+.lbl-b{font-family:var(--font);font-size:14px;font-weight:600;fill:var(--ink)}
+.diode-glow{opacity:0;transition:opacity .08s}
+.diode.on .diode-glow{opacity:1}
+.flow{stroke:#f2a516;stroke-width:3;fill:none;stroke-dasharray:4 12;opacity:0;animation:flow .6s linear infinite}
+.flow.on{opacity:.95}
+@keyframes flow{to{stroke-dashoffset:-16}}
+@media (prefers-reduced-motion:reduce){.flow{animation:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 32 32" aria-label="Wave Lab logo" fill="none">
+        <rect width="32" height="32" rx="7" fill="#101a1c"/>
+        <path d="M4 20 Q9.5 4 15 14 L28 14" stroke="#33e1a6" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M4 26 L28 26" stroke="#f2c94c" stroke-width="1.6" stroke-dasharray="2 3"/>
+      </svg>
+      Wave Shaping Lab
+    </div>
+    
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Diode wave-shaping circuits · Interactive</div>
+    <h1>Positive and negative clippers and clampers, on a virtual bench</h1>
+    <p>Each circuit is drawn with real-looking parts — signal generator, colour-coded resistor, 1N4007 diode, bias cell and electrolytic capacitor. Change the values and watch the oscilloscope: yellow is the input (CH1), green is the output (CH2). The diode glows while it conducts.</p>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" class="on" data-tab="clipper">Positive clipper</button>
+    <button role="tab" data-tab="nclipper">Negative clipper</button>
+    <button role="tab" data-tab="clamper">Positive clamper</button>
+    <button role="tab" data-tab="nclamper">Negative clamper</button>
+  </div>
+  <!-- ================= CLIPPER ================= -->
+  <section class="lab" id="clipper">
+    <div class="lab-head">
+      <h2>Positive clipper</h2><span class="tag">shunt · biased</span>
+      <p>The diode sits across the output with its anode on the output node. When the input rises above \(V_B + V_\gamma\), the diode turns on and holds the output at that level — the top of the wave is cut off. Below that level the diode is off and the output follows the input.</p>
+    </div>
+
+    <div class="card bench"><svg id="clipSvg" viewBox="0 0 900 380" role="img" aria-label="Positive clipper circuit with function generator, 1 kilo-ohm resistor, 1N4007 diode and bias battery"></svg></div>
+
+    <div class="grid2">
+      <div class="card controls">
+        <h3>Controls</h3>
+        <div class="ctl wide"><label>Input waveform</label><div class="seg" data-grp="clipWave"><button data-v="sine" class="on">Sine</button><button data-v="tri">Triangle</button><button data-v="sq">Square</button></div></div>
+        <div class="ctl"><label for="cVm">Peak input \(V_m\)</label><input id="cVm" type="range" min="1" max="12" step="0.5" value="8"><output id="cVmO"></output></div>
+        <div class="ctl"><label for="cVb">Bias battery \(V_B\)</label><input id="cVb" type="range" min="-6" max="6" step="0.5" value="3"><output id="cVbO"></output></div>
+        <div class="ctl"><label for="cF">Frequency</label><input id="cF" type="range" min="0" max="3" step="0.01" value="1"><output id="cFO"></output></div>
+        <div class="ctl wide"><label>Diode model</label><div class="seg" data-grp="clipDiode"><button data-v="0.7" class="on">Si 0.7 V</button><button data-v="0.3">Ge 0.3 V</button><button data-v="0">Ideal</button></div></div>
+        <div class="parts" id="clipParts"></div>
+      </div>
+      <div class="card scope-card">
+        <div class="scope-top"><h3 style="margin:0">Oscilloscope</h3>
+          <div class="legend"><span><i style="background:var(--ch1)"></i>CH1 Vin</span><span><i style="background:var(--ch2)"></i>CH2 Vout</span></div>
+          <span class="status" id="clipStatus">D1 OFF</span></div>
+        <canvas class="scope" id="clipScope"></canvas>
+        <div class="readouts">
+          <div><small>Clip level</small><b id="cR1">–</b></div>
+          <div><small>Vout max</small><b id="cR2">–</b></div>
+          <div><small>Vout min</small><b id="cR3">–</b></div>
+          <div><small>Scale</small><b id="cR4">–</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card theory">
+        <h3>How it works</h3>
+        <ol>
+          <li>While \(V_{in} &lt; V_B + V_\gamma\), D1 is reverse-biased (off). No current goes through it, so \(V_{out} = V_{in}\).</li>
+          <li>When \(V_{in} \ge V_B + V_\gamma\), D1 turns on. The extra voltage drops across R, and the output is held at the clip level.</li>
+          <li>The negative half cycle passes through unchanged — only the positive peak is clipped.</li>
+        </ol>
+        <div class="eq">V_out = V_in            (V_in &lt; V_B + Vγ)<br>V_out = V_B + Vγ        (V_in ≥ V_B + Vγ)</div>
+      </div>
+      <div class="card theory">
+        <h3>Bench notes</h3>
+        <ol>
+          <li>Unbiased clipper: set \(V_B = 0\). The output is clipped at about +0.7 V (silicon).</li>
+          <li>Negative \(V_B\) (cell reversed) moves the clip level below zero, so part of the negative half is clipped too.</li>
+          <li>Pick R so the diode current stays within its rating: \(I_{max} = (V_m - V_B - V_\gamma)/R\).</li>
+        </ol>
+        <div class="eq" id="clipIeq">–</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= NEGATIVE CLIPPER ================= -->
+  <section class="lab" id="nclipper" hidden>
+    <div class="lab-head">
+      <h2>Negative clipper</h2><span class="tag">shunt · biased</span>
+      <p>Same parts as the positive clipper, but the diode is turned around: the cathode is on the output node and the bias cell has its − terminal towards the diode. When the input falls below \(-(V_B + V_\gamma)\), the diode turns on and holds the output there — the bottom of the wave is cut off. Above that level the output follows the input.</p>
+    </div>
+
+    <div class="card bench"><svg id="nclipSvg" viewBox="0 0 900 380" role="img" aria-label="Negative clipper circuit with function generator, 1 kilo-ohm resistor, 1N4007 diode and bias battery"></svg></div>
+
+    <div class="grid2">
+      <div class="card controls">
+        <h3>Controls</h3>
+        <div class="ctl wide"><label>Input waveform</label><div class="seg" data-grp="nclipWave"><button data-v="sine" class="on">Sine</button><button data-v="tri">Triangle</button><button data-v="sq">Square</button></div></div>
+        <div class="ctl"><label for="nVm">Peak input \(V_m\)</label><input id="nVm" type="range" min="1" max="12" step="0.5" value="8"><output id="nVmO"></output></div>
+        <div class="ctl"><label for="nVb">Bias battery \(V_B\)</label><input id="nVb" type="range" min="-6" max="6" step="0.5" value="3"><output id="nVbO"></output></div>
+        <div class="ctl"><label for="nF">Frequency</label><input id="nF" type="range" min="0" max="3" step="0.01" value="1"><output id="nFO"></output></div>
+        <div class="ctl wide"><label>Diode model</label><div class="seg" data-grp="nclipDiode"><button data-v="0.7" class="on">Si 0.7 V</button><button data-v="0.3">Ge 0.3 V</button><button data-v="0">Ideal</button></div></div>
+        <div class="parts" id="nclipParts"></div>
+      </div>
+      <div class="card scope-card">
+        <div class="scope-top"><h3 style="margin:0">Oscilloscope</h3>
+          <div class="legend"><span><i style="background:var(--ch1)"></i>CH1 Vin</span><span><i style="background:var(--ch2)"></i>CH2 Vout</span></div>
+          <span class="status" id="nclipStatus">D1 OFF</span></div>
+        <canvas class="scope" id="nclipScope"></canvas>
+        <div class="readouts">
+          <div><small>Clip level</small><b id="nR1">–</b></div>
+          <div><small>Vout max</small><b id="nR2">–</b></div>
+          <div><small>Vout min</small><b id="nR3">–</b></div>
+          <div><small>Scale</small><b id="nR4">–</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card theory">
+        <h3>How it works</h3>
+        <ol>
+          <li>While \(V_{in} &gt; -(V_B + V_\gamma)\), D1 is reverse-biased (off). No current goes through it, so \(V_{out} = V_{in}\).</li>
+          <li>When \(V_{in} \le -(V_B + V_\gamma)\), D1 turns on. The extra voltage drops across R, and the output is held at the negative clip level.</li>
+          <li>The positive half cycle passes through unchanged — only the negative peak is clipped.</li>
+        </ol>
+        <div class="eq">V_out = V_in             (V_in &gt; −(V_B + Vγ))<br>V_out = −(V_B + Vγ)      (V_in ≤ −(V_B + Vγ))</div>
+      </div>
+      <div class="card theory">
+        <h3>Bench notes</h3>
+        <ol>
+          <li>Unbiased clipper: set \(V_B = 0\). The output is clipped at about −0.7 V (silicon).</li>
+          <li>Negative \(V_B\) (cell reversed) moves the clip level above zero, so part of the positive half is clipped too.</li>
+          <li>Pick R so the diode current stays within its rating: \(I_{max} = (V_m - V_B - V_\gamma)/R\).</li>
+        </ol>
+        <div class="eq" id="nclipIeq">–</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CLAMPER ================= -->
+  <section class="lab" id="clamper" hidden>
+    <div class="lab-head">
+      <h2>Positive clamper</h2><span class="tag">DC restorer</span>
+      <p>A series capacitor and a shunt diode (cathode on the output) shift the whole waveform up without changing its shape. On the first negative peak the diode conducts and charges C to about \(V_m - V_\gamma\). After that, C acts like a battery in series with the source, so the output swings from about \(-V_\gamma\) up to \(2V_m - V_\gamma\).</p>
+    </div>
+
+    <div class="card bench"><svg id="clampSvg" viewBox="0 0 900 380" role="img" aria-label="Positive clamper circuit with function generator, electrolytic capacitor, 1N4007 diode, bias battery and load resistor"></svg></div>
+
+    <div class="grid2">
+      <div class="card controls">
+        <h3>Controls</h3>
+        <div class="ctl wide"><label>Input waveform</label><div class="seg" data-grp="clampWave"><button data-v="sine" class="on">Sine</button><button data-v="tri">Triangle</button><button data-v="sq">Square</button></div></div>
+        <div class="ctl"><label for="kVm">Peak input \(V_m\)</label><input id="kVm" type="range" min="1" max="10" step="0.5" value="5"><output id="kVmO"></output></div>
+        <div class="ctl"><label for="kVb">Bias battery \(V_B\)</label><input id="kVb" type="range" min="-4" max="4" step="0.5" value="0"><output id="kVbO"></output></div>
+        <div class="ctl"><label for="kF">Frequency</label><input id="kF" type="range" min="0" max="3" step="0.01" value="1"><output id="kFO"></output></div>
+        <div class="ctl"><label for="kC">Capacitor C</label><input id="kC" type="range" min="0" max="4" step="1" value="2"><output id="kCO"></output></div>
+        <div class="ctl"><label for="kR">Load \(R_L\)</label><input id="kR" type="range" min="0" max="4" step="1" value="3"><output id="kRO"></output></div>
+        <div class="ctl wide"><label>Diode model</label><div class="seg" data-grp="clampDiode"><button data-v="0.7" class="on">Si 0.7 V</button><button data-v="0.3">Ge 0.3 V</button><button data-v="0">Ideal</button></div></div>
+        <div class="note" id="clampNote"></div>
+      </div>
+      <div class="card scope-card">
+        <div class="scope-top"><h3 style="margin:0">Oscilloscope · from switch-on</h3>
+          <div class="legend"><span><i style="background:var(--ch1)"></i>CH1 Vin</span><span><i style="background:var(--ch2)"></i>CH2 Vout</span></div>
+          <span class="status" id="clampStatus">D1 OFF</span></div>
+        <canvas class="scope" id="clampScope"></canvas>
+        <div class="readouts">
+          <div><small>DC shift</small><b id="kR1">–</b></div>
+          <div><small>Vout max</small><b id="kR2">–</b></div>
+          <div><small>Vout min</small><b id="kR3">–</b></div>
+          <div><small>RC / T</small><b id="kR4">–</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card theory">
+        <h3>How it works</h3>
+        <ol>
+          <li>First negative half cycle: D1 is forward-biased and C charges quickly to \(V_m - V_\gamma\), with the + plate on the output side.</li>
+          <li>Positive half cycle: D1 is off. The capacitor voltage adds to the source, so the output reaches \(2V_m - V_\gamma\).</li>
+          <li>C can only discharge slowly through \(R_L\). Keep \(R_L C \gg T\) (at least 10T) so the shift stays steady.</li>
+        </ol>
+        <div class="eq">V_out(t) ≈ V_in(t) + (V_m − Vγ + V_B)<br>V_out,min ≈ V_B − Vγ &nbsp; V_out,max ≈ 2V_m − Vγ + V_B</div>
+      </div>
+      <div class="card theory">
+        <h3>Bench notes</h3>
+        <ol>
+          <li>Notice the first cycle on the scope: the output only settles after the first negative peak. This is the start-up transient.</li>
+          <li>Try 1 µF with 1 kΩ at 50 Hz. RC is shorter than T, so the capacitor drains and the output sags (tilt).</li>
+          <li>A biased clamper (\(V_B \ne 0\)) moves the bottom of the wave to \(V_B - V_\gamma\) instead of \(-V_\gamma\).</li>
+        </ol>
+        <div class="parts" id="clampParts"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= NEGATIVE CLAMPER ================= -->
+  <section class="lab" id="nclamper" hidden>
+    <div class="lab-head">
+      <h2>Negative clamper</h2><span class="tag">DC restorer</span>
+      <p>Same parts as the positive clamper, but the diode is turned around (anode on the output) and the capacitor's + lead faces the input. On the first positive peak the diode conducts and charges C to about \(V_m - V_\gamma\). After that, C subtracts from the source, so the whole wave shifts down: the output swings from about \(+V_\gamma\) down to \(-(2V_m - V_\gamma)\).</p>
+    </div>
+
+    <div class="card bench"><svg id="nclampSvg" viewBox="0 0 900 380" role="img" aria-label="Negative clamper circuit with function generator, electrolytic capacitor, 1N4007 diode, bias battery and load resistor"></svg></div>
+
+    <div class="grid2">
+      <div class="card controls">
+        <h3>Controls</h3>
+        <div class="ctl wide"><label>Input waveform</label><div class="seg" data-grp="nclampWave"><button data-v="sine" class="on">Sine</button><button data-v="tri">Triangle</button><button data-v="sq">Square</button></div></div>
+        <div class="ctl"><label for="mVm">Peak input \(V_m\)</label><input id="mVm" type="range" min="1" max="10" step="0.5" value="5"><output id="mVmO"></output></div>
+        <div class="ctl"><label for="mVb">Bias battery \(V_B\)</label><input id="mVb" type="range" min="-4" max="4" step="0.5" value="0"><output id="mVbO"></output></div>
+        <div class="ctl"><label for="mF">Frequency</label><input id="mF" type="range" min="0" max="3" step="0.01" value="1"><output id="mFO"></output></div>
+        <div class="ctl"><label for="mC">Capacitor C</label><input id="mC" type="range" min="0" max="4" step="1" value="2"><output id="mCO"></output></div>
+        <div class="ctl"><label for="mR">Load \(R_L\)</label><input id="mR" type="range" min="0" max="4" step="1" value="3"><output id="mRO"></output></div>
+        <div class="ctl wide"><label>Diode model</label><div class="seg" data-grp="nclampDiode"><button data-v="0.7" class="on">Si 0.7 V</button><button data-v="0.3">Ge 0.3 V</button><button data-v="0">Ideal</button></div></div>
+        <div class="note" id="nclampNote"></div>
+      </div>
+      <div class="card scope-card">
+        <div class="scope-top"><h3 style="margin:0">Oscilloscope · from switch-on</h3>
+          <div class="legend"><span><i style="background:var(--ch1)"></i>CH1 Vin</span><span><i style="background:var(--ch2)"></i>CH2 Vout</span></div>
+          <span class="status" id="nclampStatus">D1 OFF</span></div>
+        <canvas class="scope" id="nclampScope"></canvas>
+        <div class="readouts">
+          <div><small>DC shift</small><b id="mR1">–</b></div>
+          <div><small>Vout max</small><b id="mR2">–</b></div>
+          <div><small>Vout min</small><b id="mR3">–</b></div>
+          <div><small>RC / T</small><b id="mR4">–</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card theory">
+        <h3>How it works</h3>
+        <ol>
+          <li>First positive half cycle: D1 is forward-biased and C charges quickly to \(V_m - V_\gamma\), with the + plate on the input side.</li>
+          <li>Negative half cycle: D1 is off. The capacitor voltage adds to the negative source voltage, so the output reaches \(-(2V_m - V_\gamma)\).</li>
+          <li>C can only discharge slowly through \(R_L\). Keep \(R_L C \gg T\) (at least 10T) so the shift stays steady.</li>
+        </ol>
+        <div class="eq">V_out(t) ≈ V_in(t) − (V_m − Vγ + V_B)<br>V_out,max ≈ −V_B + Vγ &nbsp; V_out,min ≈ −(2V_m − Vγ + V_B)</div>
+      </div>
+      <div class="card theory">
+        <h3>Bench notes</h3>
+        <ol>
+          <li>Notice the first cycle on the scope: the output only settles after the first positive peak. This is the start-up transient.</li>
+          <li>Try 1 µF with 1 kΩ at 50 Hz. RC is shorter than T, so the capacitor drains and the output sags (tilt).</li>
+          <li>A biased clamper (\(V_B \ne 0\), − terminal up) moves the top of the wave to \(-V_B + V_\gamma\) instead of \(+V_\gamma\).</li>
+        </ol>
+        <div class="parts" id="nclampParts"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">Ideal piecewise diode model with a fixed cut-in voltage Vγ. Clipper output is drawn with no load (R<sub>L</sub> → ∞). Clamper is simulated step by step, so you can see capacitor charging and discharge.</div></footer>
+
+<script>
+/* ---------------- SVG component library ---------------- */
+const BAND={0:'#111',1:'#7a3d12',2:'#d0201a',3:'#f07a12',4:'#f3d21a',5:'#2e9e3a',6:'#2357c4',7:'#7f3fbf',8:'#888',9:'#f4f4f4',gold:'#c9a227'};
+function resBands(ohms){ // 4-band
+  let exp=0,v=ohms; while(v>=100){v/=10;exp++;} v=Math.round(v);
+  const d1=Math.floor(v/10),d2=v%10; return [BAND[d1],BAND[d2],BAND[exp],BAND.gold];
+}
+function fmtOhm(o){return o>=1e6?(o/1e6)+' MΩ':o>=1e3?(o/1e3)+' kΩ':o+' Ω';}
+let uid=0;
+function resistor(cx,cy,rot,ohms,label){
+  const b=resBands(ohms), id='rg'+(uid++);
+  return `<g transform="translate(${cx},${cy}) rotate(${rot})">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1dcb0"/><stop offset=".45" stop-color="#dcbf88"/><stop offset="1" stop-color="#b2935b"/></linearGradient></defs>
+    <line class="lead" x1="-50" y1="0" x2="-30" y2="0"/><line class="lead" x1="30" y1="0" x2="50" y2="0"/>
+    <path d="M-32 -10 Q-32 -13 -27 -13 L-19 -13 Q-16 -10 -13 -10 L13 -10 Q16 -10 19 -13 L27 -13 Q32 -13 32 -10 L32 10 Q32 13 27 13 L19 13 Q16 10 13 10 L-13 10 Q-16 10 -19 13 L-27 13 Q-32 13 -32 10 Z" fill="url(#${id})" stroke="#9c7c48" stroke-width="1"/>
+    <rect x="-24" y="-13" width="5" height="26" fill="${b[0]}"/><rect x="-11" y="-10" width="5" height="20" fill="${b[1]}"/>
+    <rect x="-1" y="-10" width="5" height="20" fill="${b[2]}"/><rect x="20" y="-13" width="5" height="26" fill="${b[3]}"/>
+    <rect x="-30" y="-9" width="60" height="4" rx="2" fill="#fff" opacity=".35"/>
+  </g>${label||''}`;
+}
+function diode(cx,cy,rot,on){ // anode -x, cathode +x before rotation
+  return `<g class="diode${on?' on':''}" data-diode transform="translate(${cx},${cy}) rotate(${rot})">
+    <rect class="diode-glow" x="-34" y="-20" width="68" height="40" rx="20" fill="#ffb627" opacity=".0" style="filter:blur(8px)"/>
+    <line class="lead" x1="-52" y1="0" x2="-22" y2="0"/><line class="lead" x1="22" y1="0" x2="52" y2="0"/>
+    <rect x="-23" y="-10" width="46" height="20" rx="5" fill="#1b1d1e"/>
+    <rect x="-23" y="-10" width="46" height="6" rx="3" fill="#fff" opacity=".12"/>
+    <rect x="12" y="-10" width="6" height="20" fill="#cfd3d6"/>
+  </g>`;
+}
+function battery(cx,cy,flip,label){ // + at top when !flip
+  return `<g transform="translate(${cx},${cy}) rotate(${flip?180:0})">
+    <defs><linearGradient id="bt${uid}" x1="0" x2="1"><stop offset="0" stop-color="#1c1c1c"/><stop offset=".4" stop-color="#3b3b3b"/><stop offset="1" stop-color="#121212"/></linearGradient>
+    <linearGradient id="bc${uid}" x1="0" x2="1"><stop offset="0" stop-color="#9a5a22"/><stop offset=".45" stop-color="#e3a052"/><stop offset="1" stop-color="#8a4d18"/></linearGradient></defs>
+    <rect x="-6" y="-40" width="12" height="7" rx="2" fill="#b9bec1"/>
+    <rect x="-17" y="-34" width="34" height="68" rx="4" fill="url(#bt${uid})"/>
+    <rect x="-17" y="-34" width="34" height="22" rx="4" fill="url(#bc${uid++})"/>
+    <text x="0" y="-18" text-anchor="middle" font-family="IBM Plex Mono" font-size="13" font-weight="600" fill="#2a1606" transform="rotate(${flip?180:0} 0 -22)">+</text>
+    <text x="0" y="22" text-anchor="middle" font-family="IBM Plex Mono" font-size="13" fill="#bbb" transform="rotate(${flip?180:0} 0 18)">−</text>
+  </g>${label||''}`;
+}
+function ecap(cx,cy,rot,label){ // electrolytic, + on +x side, stripe on −x
+  const id='cg'+(uid++);
+  return `<g transform="translate(${cx},${cy}) rotate(${rot})">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d6fb8"/><stop offset=".4" stop-color="#2a54a0"/><stop offset="1" stop-color="#132e63"/></linearGradient></defs>
+    <line class="lead" x1="-55" y1="0" x2="-30" y2="0"/><line class="lead" x1="30" y1="0" x2="55" y2="0"/>
+    <rect x="-30" y="-17" width="60" height="34" rx="6" fill="url(#${id})"/>
+    <rect x="-30" y="-17" width="15" height="34" rx="5" fill="#b8c8e2"/>
+    <text x="-22.5" y="-3" text-anchor="middle" font-size="10" font-family="IBM Plex Mono" fill="#1d3c74">−</text>
+    <text x="-22.5" y="10" text-anchor="middle" font-size="10" font-family="IBM Plex Mono" fill="#1d3c74">−</text>
+    <rect x="-12" y="-17" width="2" height="34" fill="#0f2146" opacity=".5"/>
+    <rect x="-30" y="-14" width="60" height="6" rx="3" fill="#fff" opacity=".18"/>
+    <text x="10" y="4" text-anchor="middle" font-size="9" font-family="IBM Plex Mono" fill="#dce6f6" transform="rotate(${rot===180?180:0} 10 1)">105°C</text>
+  </g>${label||''}`;
+}
+function generator(x,y,wave,vm,f){
+  const icon = wave==='sine'?'M0 10 Q7 -6 14 10 T28 10':wave==='tri'?'M0 14 L7 2 L14 14 L21 2 L28 14':'M0 14 L0 2 L7 2 L7 14 L14 14 L14 2 L21 2 L21 14 L28 14';
+  return `<g transform="translate(${x},${y})">
+    <rect x="0" y="0" width="150" height="250" rx="12" fill="#d7dbd8" stroke="#a7aeab"/>
+    <rect x="0" y="0" width="150" height="30" rx="12" fill="#2a3533"/><rect x="0" y="18" width="150" height="12" fill="#2a3533"/>
+    <text x="12" y="20" font-family="IBM Plex Mono" font-size="11" fill="#cfe" letter-spacing="1">FUNC GEN</text>
+    <rect x="12" y="42" width="126" height="58" rx="5" fill="#0c1a17" stroke="#33463f"/>
+    <path d="${icon}" transform="translate(20,52)" stroke="#33e1a6" stroke-width="2" fill="none"/>
+    <text x="58" y="64" font-family="IBM Plex Mono" font-size="11" fill="#33e1a6">${vm.toFixed(1)} Vp</text>
+    <text x="20" y="90" font-family="IBM Plex Mono" font-size="11" fill="#33e1a6">${fmtF(f)}</text>
+    <circle cx="40" cy="135" r="17" fill="#3a4442"/><circle cx="40" cy="135" r="12" fill="#56605e"/><line x1="40" y1="135" x2="48" y2="126" stroke="#eee" stroke-width="2"/>
+    <circle cx="105" cy="135" r="17" fill="#3a4442"/><circle cx="105" cy="135" r="12" fill="#56605e"/><line x1="105" y1="135" x2="96" y2="126" stroke="#eee" stroke-width="2"/>
+    <text x="40" y="168" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#4d5755">AMPL</text>
+    <text x="105" y="168" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#4d5755">FREQ</text>
+    <circle cx="130" cy="70" r="0"/>
+  </g>`;
+}
+function terminal(x,y,color,text){
+  return `<g><circle cx="${x}" cy="${y}" r="10" fill="${color}" stroke="#0005"/><circle cx="${x}" cy="${y}" r="4" fill="#d9d9d9"/>${text?`<text x="${x}" y="${y+26}" text-anchor="middle" class="lbl-s">${text}</text>`:''}</g>`;
+}
+function node(x,y){return `<circle cx="${x}" cy="${y}" r="5" fill="#8d9592" stroke="#5d6563"/>`;}
+function ground(x,y){return `<g stroke="var(--wire)" stroke-width="2.5"><line x1="${x}" y1="${y}" x2="${x}" y2="${y+12}"/><line x1="${x-16}" y1="${y+12}" x2="${x+16}" y2="${y+12}"/><line x1="${x-10}" y1="${y+18}" x2="${x+10}" y2="${y+18}"/><line x1="${x-4}" y1="${y+24}" x2="${x+4}" y2="${y+24}"/></g>`;}
+function fmtF(f){return f>=1000?(f/1000).toFixed(f>=10000?0:2)+' kHz':f.toFixed(0)+' Hz';}
+
+/* ---------- schematic mini-symbols (for reference inset) ---------- */
+function symDiode(x,y,down){ // small schematic diode pointing down (anode top) or up
+  const t = down?`M${x-8} ${y-6} L${x+8} ${y-6} L${x} ${y+6} Z`:`M${x-8} ${y+6} L${x+8} ${y+6} L${x} ${y-6} Z`;
+  const bar = down?`M${x-8} ${y+6} L${x+8} ${y+6}`:`M${x-8} ${y-6} L${x+8} ${y-6}`;
+  return `<path d="${t}" fill="var(--ink)"/><path d="${bar}" stroke="var(--ink)" stroke-width="2"/>`;
+}
+
+/* ---------------- Clipper drawing ---------------- */
+const freqFromSlider=v=>Math.round(Math.pow(10,1.7+v*1.0)/10)*10; // 50 Hz .. 50 kHz
+function drawClipper(s,on,neg){
+  const VB=s.vb, flip=neg?VB>0:VB<0;
+  const svg=`
+  ${generator(20,60,s.wave,s.vm,s.f)}
+  ${terminal(170,110,'#c8302b','')}${terminal(170,290,'#222','')}
+  <text x="190" y="96" class="lbl-s">+</text><text x="190" y="318" class="lbl-s">COM</text>
+  <path class="wire" d="M170 110 L250 110"/>
+  ${resistor(300,110,0,1000)}
+  <text x="300" y="82" text-anchor="middle" class="lbl-b">R = 1 kΩ</text>
+  <text x="300" y="142" text-anchor="middle" class="lbl-s">brown·black·red·gold</text>
+  <path class="wire" d="M350 110 L720 110"/>
+  ${node(500,110)}
+  <path class="wire" d="M500 110 L500 125"/>
+  ${diode(500,165,neg?-90:90,on)}
+  <path class="wire" d="M500 217 L500 223"/>
+  ${battery(500,262,flip)}
+  <path class="wire" d="M500 302 L500 290"/>
+  <path class="wire" d="M170 290 L720 290"/>
+  ${node(500,290)}
+  <path class="flow ${on?'on':''}" d="${neg?'M180 290 L500 290 L500 110 L260 110':'M260 110 L500 110 L500 290 L180 290'}"/>
+  <text x="530" y="160" class="lbl-b">D1 · 1N4007</text>
+  <text x="530" y="178" class="lbl-s">${neg?'band (cathode) ↑ · anode ↓':'anode ↑ · band (cathode) ↓'}</text>
+  <text x="530" y="200" class="lbl-s" fill="#b4541a" style="fill:${on?'#b4541a':'var(--muted)'}">${on?'CONDUCTING':'reverse biased'}</text>
+  <text x="530" y="256" class="lbl-b">V<tspan font-size="10" dy="3">B</tspan><tspan dy="-3"> = ${Math.abs(VB).toFixed(1)} V</tspan></text>
+  <text x="530" y="274" class="lbl-s">${VB===0?'0 V (unbiased)':neg?(VB>0?'− terminal up':'cell reversed (+ up)'):(flip?'cell reversed (−V_B)':'+ terminal up')}</text>
+  ${terminal(720,110,'#c8302b','')}${terminal(720,290,'#222','')}
+  <text x="745" y="115" class="lbl">V<tspan font-size="10" dy="3">out</tspan></text>
+  <text x="745" y="295" class="lbl-s">GND</text>
+  ${ground(720,302)}
+  <text x="300" y="215" text-anchor="middle" class="lbl-s">V</text>
+  <g transform="translate(790,40)"><rect x="0" y="0" width="94" height="128" rx="10" fill="var(--surface-2)"/>
+    <text x="47" y="18" text-anchor="middle" class="lbl-s">schematic</text>
+    <path d="M14 34 L80 34 M60 34 L60 52 M60 76 L60 96 M14 114 L80 114 M60 104 L60 114" stroke="var(--ink)" stroke-width="1.6" fill="none"/>
+    <rect x="22" y="29" width="22" height="10" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.4"/>
+    ${symDiode(60,64,!neg)}
+    <path d="${neg?'M54 96 L66 96 M50 104 L70 104':'M50 96 L70 96 M54 104 L66 104'}" stroke="var(--ink)" stroke-width="2"/>
+    <text x="30" y="58" text-anchor="middle" class="lbl-s">R</text>
+  </g>`;
+  document.getElementById(neg?'nclipSvg':'clipSvg').innerHTML=svg.replace('<text x="300" y="215" text-anchor="middle" class="lbl-s">V</text>','');
+}
+
+/* ---------------- Clamper drawing ---------------- */
+const CAPS=[1,4.7,10,47,100], RLS=[1e3,10e3,47e3,100e3,1e6];
+function drawClamper(s,on,neg){
+  const VB=s.vb, flip=neg?VB>0:VB<0;
+  const svg=`
+  ${generator(20,60,s.wave,s.vm,s.f)}
+  ${terminal(170,110,'#c8302b','')}${terminal(170,290,'#222','')}
+  <text x="190" y="318" class="lbl-s">COM</text>
+  <path class="wire" d="M170 110 L245 110"/>
+  ${ecap(300,110,neg?180:0)}
+  <text x="300" y="78" text-anchor="middle" class="lbl-b">C = ${s.c} µF</text>
+  <text x="300" y="146" text-anchor="middle" class="lbl-s">${neg?'+ input · − output':'− input · + output'}</text>
+  <path class="wire" d="M355 110 L740 110"/>
+  ${node(470,110)}${node(620,110)}
+  <path class="wire" d="M470 110 L470 125"/>
+  ${diode(470,165,neg?90:-90,on)}
+  <path class="wire" d="M470 217 L470 223"/>
+  ${battery(470,262,flip)}
+  <path class="wire" d="M470 302 L470 290"/>
+  <path class="wire" d="M620 110 L620 150"/>
+  ${resistor(620,200,90,s.rl)}
+  <path class="wire" d="M620 250 L620 290"/>
+  <path class="wire" d="M170 290 L740 290"/>
+  ${node(470,290)}${node(620,290)}
+  <path class="flow ${on?'on':''}" d="${neg?'M360 110 L470 110 L470 290 L180 290':'M180 290 L470 290 L470 110 L360 110'}"/>
+  <text x="372" y="172" class="lbl-b" text-anchor="end">D1</text>
+  <text x="372" y="188" class="lbl-s" text-anchor="end">1N4007</text>
+  <text x="372" y="204" class="lbl-s" text-anchor="end">${neg?'anode ↑ · band ↓':'band ↑ (cathode)'}</text>
+  <text x="372" y="220" text-anchor="end" style="fill:${on?'#b4541a':'var(--muted)'}" class="lbl-s">${on?'CONDUCTING':'off'}</text>
+  <text x="372" y="252" text-anchor="end" class="lbl-b">V<tspan font-size="10" dy="3">B</tspan><tspan dy="-3"> = ${Math.abs(VB).toFixed(1)} V</tspan></text>
+  <text x="372" y="270" text-anchor="end" class="lbl-s">${VB===0?'0 V (unbiased)':neg?(VB>0?'− up':'cell reversed'):(flip?'cell reversed':'+ up')}</text>
+  <text x="645" y="195" class="lbl-b">R<tspan font-size="10" dy="3">L</tspan><tspan dy="-3"> = ${fmtOhm(s.rl)}</tspan></text>
+  <text x="645" y="213" class="lbl-s">load</text>
+  ${terminal(740,110,'#c8302b','')}${terminal(740,290,'#222','')}
+  <text x="762" y="115" class="lbl">V<tspan font-size="10" dy="3">out</tspan></text>
+  ${ground(740,302)}
+  <g transform="translate(790,40)"><rect x="0" y="0" width="94" height="128" rx="10" fill="var(--surface-2)"/>
+    <text x="47" y="18" text-anchor="middle" class="lbl-s">schematic</text>
+    <path d="M10 34 L26 34 M32 34 L84 34 M26 26 L26 42 M32 26 L32 42 M50 34 L50 52 M50 76 L50 96 M10 114 L84 114 M50 104 L50 114 M74 34 L74 56 M74 92 L74 114" stroke="var(--ink)" stroke-width="1.6" fill="none"/>
+    ${symDiode(50,64,!!neg)}
+    <path d="${neg?'M44 96 L56 96 M40 104 L60 104':'M40 96 L60 96 M44 104 L56 104'}" stroke="var(--ink)" stroke-width="2"/>
+    <rect x="69" y="56" width="10" height="36" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.4"/>
+    <text x="29" y="56" text-anchor="middle" class="lbl-s">C</text>
+  </g>`;
+  document.getElementById(neg?'nclampSvg':'clampSvg').innerHTML=svg;
+}
+
+/* ---------------- Signals ---------------- */
+function wave(type,ph){ // ph in cycles
+  const p=ph-Math.floor(ph);
+  if(type==='sine') return Math.sin(2*Math.PI*p);
+  if(type==='tri') return p<.25?4*p:p<.75?2-4*p:4*p-4;
+  return p<.5?1:-1;
+}
+
+/* ---------------- Scope renderer ---------------- */
+const VDIVS=[0.5,1,2,2.5,5,10];
+function setupCanvas(c){
+  const dpr=window.devicePixelRatio||1, r=c.getBoundingClientRect();
+  c.width=Math.round(r.width*dpr); c.height=Math.round(r.height*dpr);
+  const ctx=c.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return {ctx,w:r.width,h:r.height};
+}
+function drawScope(canvas,data,opts){
+  const {ctx,w,h}=setupCanvas(canvas);
+  const padL=46,padB=26,padT=10,padR=12, W=w-padL-padR, H=h-padT-padB;
+  ctx.fillStyle='#0b1413';ctx.fillRect(0,0,w,h);
+  // auto scale: 8 vertical divs, centred at opts.center
+  const maxAbs=Math.max(...data.vin.map(Math.abs),...data.vout.map(Math.abs),0.5);
+  let vdiv=VDIVS.find(d=>d*4>=maxAbs*1.02)||10;
+  const vmin=-4*vdiv, vmax=4*vdiv;
+  const X=i=>padL+i/(data.vin.length-1)*W, Y=v=>padT+(vmax-v)/(vmax-vmin)*H;
+  // grid
+  ctx.strokeStyle='#1d2f2c';ctx.lineWidth=1;
+  for(let i=0;i<=10;i++){const x=padL+i*W/10;ctx.beginPath();ctx.moveTo(x,padT);ctx.lineTo(x,padT+H);ctx.stroke();}
+  for(let j=0;j<=8;j++){const y=padT+j*H/8;ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+W,y);ctx.stroke();}
+  ctx.strokeStyle='#355651';ctx.beginPath();ctx.moveTo(padL,Y(0));ctx.lineTo(padL+W,Y(0));ctx.stroke();
+  // labels
+  ctx.fillStyle='#6f8a85';ctx.font='11px IBM Plex Mono';ctx.textAlign='right';ctx.textBaseline='middle';
+  for(let j=0;j<=8;j+=2){const v=vmax-j*vdiv;ctx.fillText((v>0?'+':'')+v+'V',padL-6,padT+j*H/8);}
+  ctx.textAlign='center';ctx.textBaseline='top';
+  for(let i=0;i<=10;i+=2){ctx.fillText((data.tTotal*i/10*1000).toFixed(data.tTotal*1000<10?1:0)+'ms',padL+i*W/10,padT+H+7);}
+  // reference lines
+  (opts.refs||[]).forEach(r=>{ctx.save();ctx.setLineDash([5,5]);ctx.strokeStyle=r.color;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(padL,Y(r.v));ctx.lineTo(padL+W,Y(r.v));ctx.stroke();ctx.restore();
+    });
+  // traces
+  const trace=(arr,col,wid,dash)=>{ctx.save();ctx.strokeStyle=col;ctx.lineWidth=wid;if(dash)ctx.setLineDash(dash);ctx.shadowColor=col;ctx.shadowBlur=6;ctx.beginPath();arr.forEach((v,i)=>i?ctx.lineTo(X(i),Y(v)):ctx.moveTo(X(i),Y(v)));ctx.stroke();ctx.restore();};
+  trace(data.vin,'#f2c94c',1.6,[6,4]);
+  trace(data.vout,'#33e1a6',2.4);
+  (opts.refs||[]).forEach(r=>{ctx.font='11px IBM Plex Mono';const tw=ctx.measureText(r.text).width;const ly=Math.max(padT+2,Y(r.v)-22);ctx.fillStyle='rgba(11,20,19,.88)';ctx.fillRect(padL+6,ly,tw+12,18);ctx.strokeStyle=r.color;ctx.lineWidth=1;ctx.strokeRect(padL+6.5,ly+.5,tw+11,17);ctx.fillStyle=r.color;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(r.text,padL+12,ly+9.5);});
+  // cursor
+  const ci=Math.round(opts.cursor*(data.vin.length-1));
+  ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(X(ci),padT);ctx.lineTo(X(ci),padT+H);ctx.stroke();
+  ctx.fillStyle='#f2c94c';ctx.beginPath();ctx.arc(X(ci),Y(data.vin[ci]),4,0,7);ctx.fill();
+  ctx.fillStyle='#33e1a6';ctx.beginPath();ctx.arc(X(ci),Y(data.vout[ci]),4.5,0,7);ctx.fill();
+  return {vdiv,ci};
+}
+
+/* ---------------- State & simulation ---------------- */
+const S={clip:{wave:'sine',vm:8,vb:3,f:100,vg:0.7}, nclip:{wave:'sine',vm:8,vb:3,f:100,vg:0.7}, clamp:{wave:'sine',vm:5,vb:0,f:100,vg:0.7,c:10,rl:100e3}, nclamp:{wave:'sine',vm:5,vb:0,f:100,vg:0.7,c:10,rl:100e3}};
+const N=1200;
+function simClip(s,neg){
+  const cycles=3, vin=[],vout=[],on=[], lvl=neg?-(s.vb+s.vg):s.vb+s.vg;
+  for(let i=0;i<N;i++){const v=s.vm*wave(s.wave,i/(N-1)*cycles);vin.push(v);const c=neg?v<=lvl:v>=lvl;vout.push(c?lvl:v);on.push(c);}
+  return {vin,vout,on,tTotal:cycles/s.f,lvl};
+}
+function simClamp(s,neg){
+  const cycles=5, T=1/s.f, sub=8, dt=T*cycles/(N-1)/sub, RC=s.rl*s.c*1e-6, ref=neg?(-s.vb+s.vg):(s.vb-s.vg);
+  let vc=0; const vin=[],vout=[],on=[];
+  for(let i=0;i<N;i++){
+    let conducting=false, vo=0, v=0;
+    for(let k=0;k<sub;k++){
+      const t=(i*sub+k)*dt; v=s.vm*wave(s.wave,t/T);
+      vo=v-vc;
+      if(neg?vo>ref:vo<ref){vo=ref;vc=v-ref;conducting=true;}
+      else{ vc=v+(vc-v)*Math.exp(-dt/RC); vo=v-vc; } // discharge through RL
+    }
+    vin.push(v);vout.push(vo);on.push(conducting);
+  }
+  return {vin,vout,on,tTotal:cycles*T,RC,T};
+}
+
+/* ---------------- Wiring up controls ---------------- */
+const $=id=>document.getElementById(id);
+document.querySelectorAll('.seg').forEach(g=>g.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  const grp=g.dataset.grp, v=b.dataset.v;
+  if(grp==='nclampWave')S.nclamp.wave=v; if(grp==='nclampDiode')S.nclamp.vg=+v; if(grp==='clipWave')S.clip.wave=v; if(grp==='nclipWave')S.nclip.wave=v; if(grp==='nclipDiode')S.nclip.vg=+v; if(grp==='clampWave')S.clamp.wave=v;
+  if(grp==='clipDiode')S.clip.vg=+v; if(grp==='clampDiode')S.clamp.vg=+v;
+  update();
+}));
+['cVm','cVb','cF','nVm','nVb','nF','kVm','kVb','kF','kC','kR','mVm','mVb','mF','mC','mR'].forEach(id=>$(id).addEventListener('input',update));
+
+let clipData,nclipData,clampData,nclampData;
+function update(){
+  const c=S.clip; c.vm=+$('cVm').value; c.vb=+$('cVb').value; c.f=freqFromSlider(+$('cF').value);
+  $('cVmO').textContent=c.vm.toFixed(1)+' V'; $('cVbO').textContent=(c.vb>0?'+':'')+c.vb.toFixed(1)+' V'; $('cFO').textContent=fmtF(c.f);
+  clipData=simClip(c);
+  const k=S.clamp; k.vm=+$('kVm').value; k.vb=+$('kVb').value; k.f=freqFromSlider(+$('kF').value); k.c=CAPS[+$('kC').value]; k.rl=RLS[+$('kR').value];
+  $('kVmO').textContent=k.vm.toFixed(1)+' V'; $('kVbO').textContent=(k.vb>0?'+':'')+k.vb.toFixed(1)+' V'; $('kFO').textContent=fmtF(k.f);
+  $('kCO').textContent=k.c+' µF'; $('kRO').textContent=fmtOhm(k.rl);
+  clampData=simClamp(k);
+  // readouts clipper
+  const omax=Math.max(...clipData.vout), omin=Math.min(...clipData.vout);
+  $('cR1').textContent=(clipData.lvl>=0?'+':'')+clipData.lvl.toFixed(2)+' V';
+  $('cR2').textContent=omax.toFixed(2)+' V'; $('cR3').textContent=omin.toFixed(2)+' V';
+  const imax=Math.max(0,(c.vm-c.vb-c.vg)/1000*1000);
+  $('clipIeq').innerHTML=`I_max = (${c.vm} − ${c.vb} − ${c.vg}) / 1 kΩ = ${imax.toFixed(2)} mA`+(c.vm<=clipData.lvl?'<br><span style="color:var(--warn)">Peak is below clip level → no clipping</span>':'');
+  $('clipParts').innerHTML=['Function generator','R 1 kΩ ¼ W','D1 1N4007','DC cell V_B','Dual-trace scope'].map(x=>`<span>${x}</span>`).join('');
+  const n=S.nclip; n.vm=+$('nVm').value; n.vb=+$('nVb').value; n.f=freqFromSlider(+$('nF').value);
+  $('nVmO').textContent=n.vm.toFixed(1)+' V'; $('nVbO').textContent=(n.vb>0?'+':'')+n.vb.toFixed(1)+' V'; $('nFO').textContent=fmtF(n.f);
+  nclipData=simClip(n,true);
+  $('nR1').textContent=(nclipData.lvl>=0?'+':'')+nclipData.lvl.toFixed(2)+' V';
+  $('nR2').textContent=Math.max(...nclipData.vout).toFixed(2)+' V'; $('nR3').textContent=Math.min(...nclipData.vout).toFixed(2)+' V';
+  const nimax=Math.max(0,(n.vm-n.vb-n.vg));
+  $('nclipIeq').innerHTML=`I_max = (${n.vm} − ${n.vb} − ${n.vg}) / 1 kΩ = ${nimax.toFixed(2)} mA`+(-n.vm>=nclipData.lvl?'<br><span style="color:var(--warn)">Negative peak does not reach clip level → no clipping</span>':'');
+  $('nclipParts').innerHTML=['Function generator','R 1 kΩ ¼ W','D1 1N4007 (reversed)','DC cell V_B (− up)','Dual-trace scope'].map(x=>`<span>${x}</span>`).join('');
+  // readouts clamper (steady state from last cycle)
+  const tail=Math.floor(N*0.8), sv=clampData.vout.slice(tail), si=clampData.vin.slice(tail);
+  const kmax=Math.max(...sv), kmin=Math.min(...sv);
+  const shift=sv.reduce((a,b)=>a+b,0)/sv.length - si.reduce((a,b)=>a+b,0)/si.length;
+  $('kR1').textContent=(shift>=0?'+':'')+shift.toFixed(2)+' V';
+  $('kR2').textContent=kmax.toFixed(2)+' V'; $('kR3').textContent=kmin.toFixed(2)+' V';
+  const ratio=clampData.RC/clampData.T; $('kR4').textContent=ratio>=100?ratio.toFixed(0):ratio.toFixed(1);
+  $('clampNote').textContent= ratio<10?`RC = ${(clampData.RC*1000).toFixed(2)} ms is not ≫ T = ${(clampData.T*1000).toFixed(2)} ms — the capacitor discharges between peaks, so the output tilts.`:`RC = ${(clampData.RC*1000).toFixed(1)} ms ≫ T = ${(clampData.T*1000).toFixed(2)} ms — the shift stays steady.`;
+  $('clampNote').style.color=ratio<10?'var(--warn)':'var(--accent)';
+  $('clampParts').innerHTML=['Function generator',`C ${k.c} µF / 25 V electrolytic`,'D1 1N4007',`R_L ${fmtOhm(k.rl)}`,'DC cell V_B'].map(x=>`<span>${x}</span>`).join('');
+  {
+  const k2=S.nclamp;k2.vm=+$('mVm').value;k2.vb=+$('mVb').value;k2.f=freqFromSlider(+$('mF').value);k2.c=CAPS[+$('mC').value];k2.rl=RLS[+$('mR').value];
+  $('mVmO').textContent=k2.vm.toFixed(1)+' V'; $('mVbO').textContent=(k2.vb>0?'+':'')+k2.vb.toFixed(1)+' V'; $('mFO').textContent=fmtF(k2.f);
+  $('mCO').textContent=k2.c+' µF'; $('mRO').textContent=fmtOhm(k2.rl);
+  nclampData=simClamp(k2,true);
+  // readouts clamper (steady state from last cycle)
+  const tail2=Math.floor(N*0.8), sv2=nclampData.vout.slice(tail2), si2=nclampData.vin.slice(tail2);
+  const kmax2=Math.max(...sv2), kmin2=Math.min(...sv2);
+  const shift2=sv2.reduce((a,b)=>a+b,0)/sv2.length - si2.reduce((a,b)=>a+b,0)/si2.length;
+  $('mR1').textContent=(shift2>=0?'+':'')+shift2.toFixed(2)+' V';
+  $('mR2').textContent=kmax2.toFixed(2)+' V'; $('mR3').textContent=kmin2.toFixed(2)+' V';
+  const ratio2=nclampData.RC/nclampData.T; $('mR4').textContent=ratio2>=100?ratio2.toFixed(0):ratio2.toFixed(1);
+  $('nclampNote').textContent= ratio2<10?`RC = ${(nclampData.RC*1000).toFixed(2)} ms is not ≫ T = ${(nclampData.T*1000).toFixed(2)} ms — the capacitor discharges between peaks, so the output tilts.`:`RC = ${(nclampData.RC*1000).toFixed(1)} ms ≫ T = ${(nclampData.T*1000).toFixed(2)} ms — the shift stays steady.`;
+  $('nclampNote').style.color=ratio2<10?'var(--warn)':'var(--accent)';
+  $('nclampParts').innerHTML=['Function generator',`C ${k2.c} µF / 25 V electrolytic`,'D1 1N4007',`R_L ${fmtOhm(k2.rl)}`,'DC cell V_B'].map(x=>`<span>${x}</span>`).join('');
+  }
+  lastClipOn=null;lastNOn=null;lastClampOn=null;lastNCOn=null;
+}
+
+/* ---------------- Animation loop ---------------- */
+let lastClipOn=null,lastNOn=null,lastClampOn=null,lastNCOn=null, t0=performance.now();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function frame(now){
+  const cur=reduce?0.3:((now-t0)/6000)%1;
+  if(!$('clipper').hidden){
+  // clipper
+  const r1=drawScope($('clipScope'),clipData,{cursor:cur,refs:[{v:clipData.lvl,color:'#ff9f5a',text:'clip level V_B+Vγ = '+clipData.lvl.toFixed(1)+' V'}]});
+  const on1=clipData.on[r1.ci];
+  if(on1!==lastClipOn){drawClipper(S.clip,on1,false);lastClipOn=on1;$('clipStatus').textContent=on1?'D1 ON · clipping':'D1 OFF';$('clipStatus').classList.toggle('on',on1);}
+  $('cR4').textContent=r1.vdiv+' V/div';
+  }
+  if(!$('nclipper').hidden){
+  const r3=drawScope($('nclipScope'),nclipData,{cursor:cur,refs:[{v:nclipData.lvl,color:'#ff9f5a',text:'clip level −(V_B+Vγ) = '+nclipData.lvl.toFixed(1)+' V'}]});
+  const on3=nclipData.on[r3.ci];
+  if(on3!==lastNOn){drawClipper(S.nclip,on3,true);lastNOn=on3;$('nclipStatus').textContent=on3?'D1 ON · clipping':'D1 OFF';$('nclipStatus').classList.toggle('on',on3);}
+  $('nR4').textContent=r3.vdiv+' V/div';
+  }
+  if(!$('clamper').hidden){
+  const k=S.clamp, refV=k.vb-k.vg;
+  const r2=drawScope($('clampScope'),clampData,{cursor:cur,refs:[{v:refV,color:'#ff9f5a',text:'clamp level V_B−Vγ = '+refV.toFixed(1)+' V'}]});
+  const on2=clampData.on[r2.ci];
+  if(on2!==lastClampOn){drawClamper(S.clamp,on2,false);lastClampOn=on2;$('clampStatus').textContent=on2?'D1 ON · charging C':'D1 OFF';$('clampStatus').classList.toggle('on',on2);}
+  }
+  if(!$('nclamper').hidden){
+  const q=S.nclamp, refN=-q.vb+q.vg;
+  const r4=drawScope($('nclampScope'),nclampData,{cursor:cur,refs:[{v:refN,color:'#ff9f5a',text:'clamp level −V_B+Vγ = '+refN.toFixed(1)+' V'}]});
+  const on4=nclampData.on[r4.ci];
+  if(on4!==lastNCOn){drawClamper(S.nclamp,on4,true);lastNCOn=on4;$('nclampStatus').textContent=on4?'D1 ON · charging C':'D1 OFF';$('nclampStatus').classList.toggle('on',on4);}
+  }
+  requestAnimationFrame(frame);
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  ['clipper','nclipper','clamper','nclamper'].forEach(id=>$(id).hidden=id!==b.dataset.tab);
+  lastClipOn=lastNOn=lastClampOn=lastNCOn=null;
+}));
+update();
+document.fonts&&document.fonts.ready.then(()=>{});
+requestAnimationFrame(frame);
+</script>
+<script>
+  window.MathJax={tex:{inlineMath:[['\\(','\\)']]},svg:{fontCache:'global'}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<script data-pplx-inline-edit>
+(function () {
+  if (window === window.top) return;
+
+  const allowedParentOrigins = ["https://www.perplexity.ai","https://perplexity.ai","https://testing.perplexity.ai","https://staging.perplexity.ai","https://*.preview.i.perplexity.ai","http://perplexity.localhost","http://localhost:1420","http://127.0.0.1:1420","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173","http://127.0.0.1:5173"];
+  const MAX_FONT_BYTES = 500 * 1024;
+  const MAX_TOTAL_FONT_BYTES = 2 * 1024 * 1024;
+  const DEFAULT_LINE_HEIGHT = 16;
+  let scrollForwarding = false;
+  let scrollRaf = 0;
+  let trustedTopOrigin = null;
+
+  // Allow entries like "https://*.preview.i.perplexity.ai" — the wildcard
+  // matches a single DNS label (no dots), so "https://*.foo" cannot stretch
+  // across multiple labels.
+  function matchesAllowedOrigin(origin) {
+    if (!origin) return false;
+    for (const entry of allowedParentOrigins) {
+      if (!entry.includes("*")) {
+        if (entry === origin) return true;
+        continue;
+      }
+      const pattern = new RegExp(
+        "^" +
+          entry.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]+") +
+          "$",
+      );
+      if (pattern.test(origin)) return true;
+    }
+    return false;
+  }
+
+  // Trust decision: when the sender is same-origin-visible (event.origin is a
+  // real origin like https://www.perplexity.ai) we trust event.origin directly.
+  // When event.origin is "null" (opaque broker srcdoc), we fall back to the
+  // broker's stamped `parentOrigin` to identify the top window. The fallback
+  // is claim-only — we rely on the browser's native `targetOrigin` enforcement
+  // on the response path (see postToTrustedTop) to ensure replies can't be
+  // delivered to anyone but the actual top window of that claimed origin.
+  function getTrustedParentOrigin(event) {
+    const forwardedParentOrigin =
+      typeof event.data.parentOrigin === "string" ? event.data.parentOrigin : null;
+    const parentOrigin = event.origin === "null" ? forwardedParentOrigin : event.origin;
+    return matchesAllowedOrigin(parentOrigin) ? parentOrigin : null;
+  }
+
+  // All responses go to window.top with targetOrigin = the allowlisted origin.
+  // An attacker that iframes us inside their own null-origin broker can claim
+  // any parentOrigin they like, but the browser will drop the reply whenever
+  // the real top's origin doesn't match — so the screenshot never leaves.
+  function postToTrustedTop(message) {
+    if (!trustedTopOrigin) return;
+    try {
+      window.top.postMessage(message, trustedTopOrigin);
+    } catch (_error) {}
+  }
+
+  const PICK_CAPABILITIES = ["pick"];
+  const PICK_CHAIN_LENGTH = 4;
+  const PICK_MAX_TEXT_CHARS = 120;
+  const PICK_MAX_HTML_CHARS = 300;
+
+  function truncate(value, maxChars) {
+    return value.length > maxChars ? value.slice(0, maxChars - 1) + "…" : value;
+  }
+
+  function isPickableElement(element) {
+    return (
+      element instanceof Element &&
+      element !== document.documentElement &&
+      element !== document.body
+    );
+  }
+
+  function resolvePickTarget(x, y) {
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+    const element = document.elementFromPoint(x, y);
+    return isPickableElement(element) ? element.closest("svg") || element : null;
+  }
+
+  function pickLabel(element) {
+    if (element.id) return element.localName + "#" + element.id;
+    return [element.localName].concat(Array.from(element.classList).slice(0, 2)).join(".");
+  }
+
+  // Only attributes that help find the element in source. data-* values and URL
+  // query strings or fragments can carry tokens.
+  const PICK_ATTRIBUTES = new Set([
+    "id",
+    "class",
+    "name",
+    "type",
+    "role",
+    "alt",
+    "aria-label",
+    "href",
+    "src",
+  ]);
+
+  function pickAttributeValue(attribute) {
+    return attribute.name === "href" || attribute.name === "src"
+      ? attribute.value.split(/[?#]/)[0]
+      : attribute.value;
+  }
+
+  function describePickElement(element) {
+    const chain = [];
+    for (
+      let current = element;
+      isPickableElement(current) && chain.length < PICK_CHAIN_LENGTH;
+      current = current.parentElement
+    ) {
+      chain.unshift(current);
+    }
+    const attributes = Array.from(element.attributes)
+      .filter((attribute) => PICK_ATTRIBUTES.has(attribute.name))
+      .map((attribute) => ` ${attribute.name}="${pickAttributeValue(attribute).replace(/"/g, "&quot;")}"`)
+      .join("");
+    const text = (element.innerText || element.textContent || "").replace(/\s+/g, " ").trim();
+    return {
+      chain: chain.map(pickLabel),
+      html: truncate(`<${element.localName}${attributes}>`, PICK_MAX_HTML_CHARS),
+      text: text ? truncate(text, PICK_MAX_TEXT_CHARS) : undefined,
+    };
+  }
+
+  // Hover asks once per frame, and innerText on a large section forces layout,
+  // so only the rect is re-read while the pointer stays on the same element.
+  // Clicks ask for fresh details since the page may have changed the element.
+  let lastPick = null;
+
+  function describePickTarget(element, fresh) {
+    if (fresh || lastPick?.element !== element) {
+      lastPick = { element, details: describePickElement(element) };
+    }
+    const rect = element.getBoundingClientRect();
+    return {
+      rect: { x: rect.left, y: rect.top, width: rect.width, height: rect.height },
+      ...lastPick.details,
+    };
+  }
+
+  function inlineAll(original, clone) {
+    if (original.nodeType !== 1 || clone.nodeType !== 1) return;
+
+    try {
+      const computedStyle = getComputedStyle(original);
+      // cssText on a computed style is the serialized declaration in modern
+      // Chromium/Safari — a single read beats enumerating ~400 longhand
+      // properties. Firefox returns "" here, so we fall back on empty.
+      const serialized = computedStyle.cssText;
+      if (serialized) {
+        clone.style.cssText = serialized;
+      } else {
+        const parts = new Array(computedStyle.length);
+        for (let index = 0; index < computedStyle.length; index += 1) {
+          const property = computedStyle[index];
+          parts[index] = `${property}:${computedStyle.getPropertyValue(property)};`;
+        }
+        clone.style.cssText = parts.join("");
+      }
+    } catch (_error) {}
+
+    const originalChildren = original.children;
+    const clonedChildren = clone.children;
+    for (
+      let index = 0;
+      index < originalChildren.length && index < clonedChildren.length;
+      index += 1
+    ) {
+      inlineAll(originalChildren[index], clonedChildren[index]);
+    }
+  }
+
+  function extractFontUrl(srcValue) {
+    const matches = [
+      ...srcValue.matchAll(
+        /url\(["']?([^"')]+)["']?\)(?:\s*format\(["']?([^"')]+)["']?\))?/gi,
+      ),
+    ];
+    if (matches.length === 0) return null;
+    const woff2 = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff2"));
+    if (woff2) return woff2[1];
+    const woff = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff"));
+    if (woff) return woff[1];
+    return matches[0][1];
+  }
+
+  // Cache resolved font URL -> data URI across captures. Fonts on a page
+  // essentially never change, and a batch run emits multiple captures back to
+  // back — without this we'd refetch + re-base64 every time.
+  const fontDataUriCache = new Map();
+  const SRC_DECLARATION_RE = /src\s*:\s*[^;}]+/i;
+
+  async function fetchAsDataUri(url) {
+    if (fontDataUriCache.has(url)) return fontDataUriCache.get(url);
+    let dataUri = null;
+    try {
+      const response = await fetch(url, { mode: "cors", credentials: "omit" });
+      if (response.ok) {
+        const blob = await response.blob();
+        if (blob.size <= MAX_FONT_BYTES) {
+          dataUri = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              resolve(typeof reader.result === "string" ? reader.result : null);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+          });
+        }
+      }
+    } catch (_error) {
+      dataUri = null;
+    }
+    fontDataUriCache.set(url, dataUri);
+    return dataUri;
+  }
+
+  function collectFontFaceRuleTexts() {
+    const rules = [];
+    for (const sheet of document.styleSheets) {
+      let cssRules;
+      try {
+        cssRules = sheet.cssRules;
+      } catch (_error) {
+        continue;
+      }
+      if (!cssRules) continue;
+      for (const rule of cssRules) {
+        const cssText = rule.cssText || "";
+        if (cssText.startsWith("@font-face")) rules.push(cssText);
+      }
+    }
+    return rules;
+  }
+
+  async function buildInlinedFontCss() {
+    const ruleTexts = collectFontFaceRuleTexts();
+    if (ruleTexts.length === 0) return null;
+
+    const resolved = ruleTexts.map((cssText) => {
+      if (!SRC_DECLARATION_RE.test(cssText)) return null;
+      const srcMatch = cssText.match(/src\s*:\s*([^;}]+)[;}]/i);
+      if (!srcMatch) return null;
+      const url = extractFontUrl(srcMatch[1]);
+      if (!url) return null;
+      try {
+        return { cssText, url: new URL(url, document.baseURI).href };
+      } catch (_error) {
+        return null;
+      }
+    });
+
+    const dataUris = await Promise.all(
+      resolved.map((entry) => (entry ? fetchAsDataUri(entry.url) : Promise.resolve(null))),
+    );
+
+    const inlined = [];
+    let totalBytes = 0;
+    for (let index = 0; index < resolved.length; index += 1) {
+      const entry = resolved[index];
+      const dataUri = dataUris[index];
+      if (!entry || !dataUri) continue;
+      const approxBytes = dataUri.length * 0.75;
+      if (totalBytes + approxBytes > MAX_TOTAL_FONT_BYTES) break;
+      totalBytes += approxBytes;
+      inlined.push(entry.cssText.replace(SRC_DECLARATION_RE, `src: url("${dataUri}")`));
+    }
+    return inlined.length > 0 ? inlined.join("\n") : null;
+  }
+
+  function stripExternal(clone) {
+    const images = clone.querySelectorAll("img");
+    for (let index = 0; index < images.length; index += 1) {
+      const src = images[index].getAttribute("src");
+      if (src && !src.startsWith("data:")) images[index].removeAttribute("src");
+    }
+
+    const elements = clone.querySelectorAll("*");
+    for (let index = 0; index < elements.length; index += 1) {
+      const style = elements[index].style.cssText;
+      if (style && style.includes("url(")) {
+        elements[index].style.cssText = style.replace(
+          /url\(["']?(?!data:)[^)"']*["']?\)/gi,
+          "none",
+        );
+      }
+    }
+  }
+
+  function emitScroll() {
+    scrollRaf = 0;
+    if (!scrollForwarding) return;
+    postToTrustedTop({
+      type: "INLINE_EDIT_SCROLL",
+      scrollX: window.scrollX,
+      scrollY: window.scrollY,
+      capabilities: PICK_CAPABILITIES,
+    });
+  }
+
+  window.addEventListener(
+    "scroll",
+    function () {
+      if (!scrollForwarding || scrollRaf) return;
+      scrollRaf = requestAnimationFrame(emitScroll);
+    },
+    { passive: true, capture: true },
+  );
+
+  async function handleCaptureRequest(event) {
+    const requestId = event.data.requestId;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    function postResult(dataUrl) {
+      postToTrustedTop({
+        type: "INLINE_EDIT_SCREENSHOT_RESULT",
+        requestId,
+        dataUrl,
+        scrollX,
+        scrollY,
+      });
+    }
+
+    try {
+      // Wait for any pending web fonts to resolve so both inline metrics and
+      // the @font-face inlining below see the same loaded faces.
+      if (document.fonts && document.fonts.ready) {
+        try {
+          await document.fonts.ready;
+        } catch (_error) {}
+      }
+
+      const clone = document.documentElement.cloneNode(true);
+      inlineAll(document.documentElement, clone);
+
+      const removedNodes = clone.querySelectorAll("script,link[rel=\"stylesheet\"],style");
+      for (let index = 0; index < removedNodes.length; index += 1) {
+        removedNodes[index].remove();
+      }
+
+      stripExternal(clone);
+
+      // Re-embed web fonts as data-URI @font-face rules so the SVG rasterizer
+      // can resolve them — external font URLs aren't fetched during
+      // foreignObject rendering, which would otherwise force a fallback face
+      // and change text metrics.
+      const inlinedFontCss = await buildInlinedFontCss();
+      if (inlinedFontCss) {
+        const styleEl = document.createElement("style");
+        styleEl.textContent = inlinedFontCss;
+        const head = clone.querySelector("head");
+        if (head) head.appendChild(styleEl);
+        else clone.insertBefore(styleEl, clone.firstChild);
+      }
+
+      const html = new XMLSerializer().serializeToString(clone);
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
+        '<foreignObject width="100%" height="100%">' +
+        `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden">` +
+        `<div style="position:relative;left:-${scrollX}px;top:-${scrollY}px">` +
+        html +
+        "</div></div></foreignObject></svg>";
+      const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+      const image = new Image();
+      image.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(image, 0, 0);
+        postResult(canvas.toDataURL("image/png"));
+      };
+      image.onerror = function () {
+        postResult(null);
+      };
+      image.src = svgUrl;
+    } catch (_error) {
+      postResult(null);
+    }
+  }
+
+  window.addEventListener("message", function (event) {
+    if (!event.data) return;
+    // Only accept messages from the direct parent frame. Blocks sibling /
+    // unrelated-window postMessage senders that could otherwise reach us.
+    if (event.source !== window.parent) return;
+
+    const trustedParentOrigin = getTrustedParentOrigin(event);
+    if (!trustedParentOrigin) return;
+    trustedTopOrigin = trustedParentOrigin;
+
+    if (event.data.type === "INLINE_EDIT_PICK") {
+      const element = resolvePickTarget(event.data.x, event.data.y);
+      postToTrustedTop({
+        type: "INLINE_EDIT_PICK_RESULT",
+        seq: event.data.seq,
+        target: element ? describePickTarget(element, event.data.fresh === true) : null,
+      });
+      return;
+    }
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_START") {
+      scrollForwarding = true;
+      emitScroll();
+      return;
+    }
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_STOP") {
+      scrollForwarding = false;
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = 0;
+      return;
+    }
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_BY") {
+      const { deltaX, deltaY, deltaMode } = event.data;
+      if (!scrollForwarding || !Number.isFinite(deltaX) || !Number.isFinite(deltaY)) return;
+      if (deltaMode !== 0 && deltaMode !== 1 && deltaMode !== 2) return;
+      const lineHeight =
+        parseFloat(getComputedStyle(document.documentElement).lineHeight) || DEFAULT_LINE_HEIGHT;
+      const scaleX = deltaMode === 1 ? lineHeight : deltaMode === 2 ? window.innerWidth : 1;
+      const scaleY = deltaMode === 1 ? lineHeight : deltaMode === 2 ? window.innerHeight : 1;
+      // The selection overlay receives the wheel event instead of this iframe.
+      // Instant scrolling preserves trackpad deltas even on smooth-scroll sites.
+      window.scrollBy({ left: deltaX * scaleX, top: deltaY * scaleY, behavior: "instant" });
+      emitScroll();
+      return;
+    }
+
+    if (event.data.type !== "INLINE_EDIT_CAPTURE_REQUEST") return;
+
+    handleCaptureRequest(event);
+  });
+})();
+
+
+</script></body>
+</html>

@@ -11,7 +11,8 @@ import {
   FileCheck2, 
   GraduationCap,
   ShieldCheck,
-  Zap
+  Zap,
+  Sliders
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -20,6 +21,7 @@ export default function Navbar() {
     { path: '/live-camera', label: 'Live Camera', icon: Camera },
     { path: '/scanner', label: 'Scanner', icon: Scan },
     { path: '/hardware-monitor', label: 'Hardware Monitor', icon: Zap },
+    { path: '/clipper-clamper-lab', label: 'Wave Lab', icon: Sliders },
     { path: '/analysis', label: 'Analysis', icon: Activity },
     { path: '/simulator', label: 'Simulator', icon: Box },
     { path: '/calculator', label: 'Calculator', icon: Calculator },
