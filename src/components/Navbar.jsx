@@ -10,7 +10,8 @@ import {
   Calculator, 
   FileCheck2, 
   GraduationCap,
-  ShieldCheck
+  ShieldCheck,
+  Zap
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -18,6 +19,7 @@ export default function Navbar() {
     { path: '/', label: 'Home', icon: Home },
     { path: '/live-camera', label: 'Live Camera', icon: Camera },
     { path: '/scanner', label: 'Scanner', icon: Scan },
+    { path: '/hardware-monitor', label: 'Hardware Monitor', icon: Zap },
     { path: '/analysis', label: 'Analysis', icon: Activity },
     { path: '/simulator', label: 'Simulator', icon: Box },
     { path: '/calculator', label: 'Calculator', icon: Calculator },

@@ -18,6 +18,13 @@ export default function Home() {
 
   const features = [
     {
+      title: 'AR DC Motor Monitor',
+      desc: 'Real-time animated circuit current flow, dual motor control, and live ESP32 telemetry.',
+      icon: Zap,
+      link: '/hardware-monitor',
+      badge: 'Live AR & Hardware'
+    },
+    {
       title: 'Breadboard Scanner',
       desc: 'Capture or upload breadboard images for instant netlist identification.',
       icon: Scan,

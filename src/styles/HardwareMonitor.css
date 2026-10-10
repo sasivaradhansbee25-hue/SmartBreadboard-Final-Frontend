@@ -1,0 +1,462 @@
+/* Hardware Monitor & AR DC Motor Control Styles for SmartBreadboard-Final-Frontend */
+
+.hardware-monitor-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+  color: var(--text-main);
+}
+
+/* Header & Banner */
+.hm-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.hm-title-section h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hm-title-section p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-top: 0.35rem;
+}
+
+.hm-mode-selector {
+  display: flex;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border-color);
+  padding: 4px;
+  border-radius: 12px;
+  gap: 4px;
+}
+
+.hm-mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hm-mode-btn.active {
+  background: var(--accent-cyan);
+  color: #080c14;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+}
+
+.hm-mode-btn.active.hardware-mode {
+  background: var(--accent-emerald);
+  box-shadow: 0 0 15px rgba(52, 211, 153, 0.3);
+}
+
+/* Status Banner */
+.hm-status-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.hm-status-banner.simulation {
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: var(--accent-cyan);
+}
+
+.hm-status-banner.connected {
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: var(--accent-emerald);
+}
+
+.hm-status-banner.disconnected {
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: var(--accent-rose);
+}
+
+/* Stage & SVG Overlay */
+.hm-stage {
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(120deg, rgba(22, 62, 82, 0.65), rgba(6, 23, 32, 0.85)),
+              repeating-linear-gradient(0deg, transparent 0 39px, rgba(84, 220, 255, 0.04) 40px),
+              repeating-linear-gradient(90deg, transparent 0 39px, rgba(84, 220, 255, 0.04) 40px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  margin-bottom: 1.5rem;
+}
+
+.hm-stage-badge-left {
+  position: absolute;
+  left: 20px;
+  top: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #aceeff;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hm-stage-badge-right {
+  position: absolute;
+  right: 20px;
+  top: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent-emerald);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hm-total-badge {
+  position: absolute;
+  left: 50%;
+  top: 45px;
+  transform: translateX(-50%);
+  padding: 8px 18px;
+  border: 1px solid #51eaff;
+  background: rgba(5, 25, 35, 0.92);
+  border-radius: 12px;
+  color: var(--accent-emerald);
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 20px rgba(39, 223, 255, 0.25);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hm-svg {
+  width: 100%;
+  height: 470px;
+  display: block;
+}
+
+/* SVG Schematic Styles */
+.hm-wire {
+  fill: none;
+  stroke: #285466;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke 0.3s ease;
+}
+
+.hm-wire.power {
+  stroke: #43e7ff;
+  filter: drop-shadow(0 0 6px #35dcff);
+}
+
+.hm-flow {
+  fill: none;
+  stroke: #d9fdff;
+  stroke-width: 3;
+  stroke-dasharray: 2 14;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hm-flow.live {
+  opacity: 1;
+  animation: hm-flow-anim 0.52s linear infinite;
+  filter: drop-shadow(0 0 5px white);
+}
+
+@keyframes hm-flow-anim {
+  to {
+    stroke-dashoffset: -16px;
+  }
+}
+
+.hm-label {
+  fill: #dffaff;
+  font-size: 15px;
+  font-weight: 800;
+  font-family: var(--font-sans);
+}
+
+.hm-small {
+  fill: #a8d4df;
+  font-size: 12px;
+  font-family: var(--font-sans);
+}
+
+.hm-pcb {
+  fill: #125747;
+  stroke: #5bffc8;
+  stroke-width: 2;
+}
+
+.hm-boardline {
+  stroke: #67deb7;
+  stroke-width: 2;
+  fill: none;
+}
+
+.hm-metal {
+  fill: #87949a;
+  stroke: #e1fcff;
+  stroke-width: 2;
+}
+
+.hm-motorcase {
+  fill: url(#motorGrad);
+  stroke: #b9fbff;
+  stroke-width: 3;
+  transition: filter 0.3s ease;
+}
+
+.hm-motorend {
+  fill: #17242b;
+  stroke: #a7e9f7;
+  stroke-width: 2;
+}
+
+.hm-terminal {
+  fill: #d39d37;
+  stroke: #ffe7a6;
+  stroke-width: 1;
+}
+
+.hm-fan {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.hm-motor.spin .hm-fan {
+  animation: hm-spin-anim 0.35s linear infinite;
+}
+
+@keyframes hm-spin-anim {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hm-motor.off {
+  opacity: 0.45;
+}
+
+.hm-motor.on .hm-motorcase {
+  filter: drop-shadow(0 0 12px #36ffc6);
+}
+
+.hm-motor.starting .hm-motorcase {
+  filter: drop-shadow(0 0 10px #fbbf24);
+}
+
+.hm-component {
+  filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.5));
+}
+
+.hm-tag {
+  fill: #06151e;
+  stroke: #56e6ff;
+  stroke-width: 1;
+}
+
+.hm-read {
+  font-size: 14px;
+  font-weight: 800;
+  fill: #48f4af;
+  font-family: var(--font-mono);
+}
+
+.hm-read.starting {
+  fill: #fbbf24;
+}
+
+/* Control Grid & Panels */
+.hm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.hm-panel {
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+}
+
+.hm-panel h2 {
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 1.25rem;
+  color: #bcefff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hm-control-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(43, 93, 114, 0.6);
+  background: rgba(7, 24, 35, 0.75);
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.hm-control-card:hover {
+  border-color: var(--accent-cyan);
+}
+
+.hm-control-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.hm-control-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.hm-btn {
+  cursor: pointer;
+  border: none;
+  border-radius: 9px;
+  padding: 0.65rem 1.25rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: #234957;
+  color: #d8fbff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.hm-btn:hover {
+  filter: brightness(1.15);
+}
+
+.hm-btn.on {
+  background: linear-gradient(135deg, #05b889, #4cf6b7);
+  color: #03251e;
+  box-shadow: 0 0 18px rgba(45, 242, 181, 0.4);
+}
+
+.hm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hm-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.hm-card {
+  border: 1px solid rgba(41, 92, 114, 0.6);
+  background: rgba(6, 23, 32, 0.8);
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+.hm-card span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.hm-card strong {
+  color: var(--accent-cyan);
+  font-size: 1.5rem;
+  font-family: var(--font-mono);
+  display: block;
+  margin-top: 0.25rem;
+}
+
+.hm-card.totalcard strong {
+  color: var(--accent-emerald);
+}
+
+.hm-card strong.starting {
+  color: var(--accent-amber);
+  font-size: 1.15rem;
+  animation: pulse-glow 1s infinite;
+}
+
+.hm-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 1rem;
+  line-height: 1.4;
+}
+
+.hm-hardware-notice {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  padding: 1rem;
+  border-radius: 12px;
+  margin-top: 1.5rem;
+  color: var(--accent-amber);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.hm-hardware-notice h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .hm-grid {
+    grid-template-columns: 1fr;
+  }
+  .hm-svg {
+    height: 380px;
+  }
+  .hm-total-badge {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    top: 40px;
+  }
+}
