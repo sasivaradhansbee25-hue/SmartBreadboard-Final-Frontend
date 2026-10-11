@@ -9,9 +9,9 @@ import {
   GraduationCap, 
   Zap, 
   Cpu, 
-  ShieldCheck, 
-  ArrowRight,
-  Sparkles
+  ShieldCheck,
+  Sparkles,
+  Binary
 } from 'lucide-react';
 
 export default function Home() {
@@ -23,6 +23,13 @@ export default function Home() {
       icon: Zap,
       link: '/hardware-monitor',
       badge: 'Live AR & Hardware'
+    },
+    {
+      title: 'Full Adder & Subtractor Lab',
+      desc: 'Interactive 3D-style breadboard with real 74HC ICs, animated logic paths, truth tables, and AR camera view.',
+      icon: Binary,
+      link: '/full-adder-subtractor-lab',
+      badge: 'Digital Logic Lab'
     },
     {
       title: 'Clipper & Clamper Lab',

@@ -1,0 +1,1071 @@
+/* Scoped stylesheet for Full Adder & Full Subtractor Interactive Lab */
+
+.fas-lab-root {
+  --fas-bg: #06111f;
+  --fas-panel: #0b1c2d;
+  --fas-panel2: #10263a;
+  --fas-line: #21425b;
+  --fas-text: #eaf6ff;
+  --fas-muted: #9ab4c9;
+  --fas-cyan: #39d9ff;
+  --fas-green: #22f29a;
+  --fas-red: #ff485e;
+  --fas-yellow: #ffc857;
+
+  width: 100%;
+  color: var(--fas-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  box-sizing: border-box;
+  padding-bottom: 2.5rem;
+}
+
+.fas-lab-root * {
+  box-sizing: border-box;
+}
+
+.fas-lab-root button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.fas-lab-root button:focus-visible {
+  outline: 2px solid var(--fas-yellow);
+  outline-offset: 2px;
+}
+
+/* Lab Header */
+.fas-lab-root .lab-header {
+  min-height: 76px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--fas-line);
+  background: rgba(6, 17, 31, 0.94);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+.fas-lab-root .brandIcon {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--fas-cyan);
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: var(--fas-cyan);
+  font-size: 22px;
+  box-shadow: 0 0 18px rgba(0, 207, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.fas-lab-root .brand {
+  min-width: 220px;
+}
+
+.fas-lab-root .brand h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--fas-text);
+  letter-spacing: -0.01em;
+}
+
+.fas-lab-root .brand p {
+  margin: 2px 0 0;
+  color: var(--fas-muted);
+  font-size: 12px;
+}
+
+.fas-lab-root .modeTabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--fas-line);
+  border-radius: 12px;
+  background: #071624;
+  margin: auto;
+}
+
+.fas-lab-root .modeTabs button,
+.fas-lab-root .viewTabs button {
+  background: transparent;
+  color: var(--fas-muted);
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.fas-lab-root .modeTabs button:hover,
+.fas-lab-root .viewTabs button:hover {
+  color: #fff;
+}
+
+.fas-lab-root .modeTabs button.active,
+.fas-lab-root .viewTabs button.active {
+  background: linear-gradient(110deg, #087fb0, #075b8a);
+  color: white;
+  box-shadow: 0 0 16px rgba(0, 207, 255, 0.25);
+}
+
+.fas-lab-root .viewTabs {
+  display: flex;
+  gap: 3px;
+  border: 1px solid var(--fas-line);
+  border-radius: 12px;
+  padding: 4px;
+  background: #071624;
+}
+
+/* Main Grid Layout */
+.fas-lab-root .lab-main {
+  max-width: 1600px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 185px minmax(400px, 1fr) 295px;
+  gap: 14px;
+}
+
+.fas-lab-root .panel {
+  background: linear-gradient(145deg, rgba(13, 33, 51, 0.93), rgba(8, 23, 37, 0.93));
+  border: 1px solid var(--fas-line);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+}
+
+/* Side Navigation */
+.fas-lab-root .sideNav {
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: fit-content;
+}
+
+.fas-lab-root .navbtn {
+  padding: 11px 12px;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #b9d3e8;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.fas-lab-root .navbtn:hover,
+.fas-lab-root .navbtn.active {
+  background: #063c59;
+  border-color: #087eac;
+  color: #fff;
+}
+
+.fas-lab-root .navbtn span {
+  display: inline-block;
+  width: 24px;
+  color: var(--fas-cyan);
+  font-weight: bold;
+}
+
+/* Center Column */
+.fas-lab-root .center {
+  min-width: 0;
+}
+
+/* Stage & AR Simulation */
+.fas-lab-root .stage {
+  position: relative;
+  min-height: 440px;
+  height: min(57vw, 590px);
+  max-height: 590px;
+  background: radial-gradient(ellipse at 50% 80%, #30251b 0, #0c1b28 65%);
+  border-radius: 14px;
+  border: 1px solid #1e4862;
+  overflow: hidden;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.4);
+}
+
+.fas-lab-root .stageTop {
+  position: absolute;
+  z-index: 4;
+  top: 12px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+.fas-lab-root .stageTop > * {
+  pointer-events: auto;
+}
+
+.fas-lab-root .status {
+  font-size: 11px;
+  border: 1px solid #31536b;
+  border-radius: 999px;
+  padding: 5px 11px;
+  background: rgba(6, 17, 31, 0.85);
+  color: #9cecff;
+  font-family: Consolas, monospace;
+  letter-spacing: 0.04em;
+  display: inline-block;
+}
+
+.fas-lab-root .stageTools {
+  display: flex;
+  gap: 6px;
+}
+
+.fas-lab-root .mini {
+  font-size: 11px;
+  background: #0b2032;
+  border: 1px solid #2a526b;
+  color: #d8f5ff;
+  border-radius: 8px;
+  padding: 7px 11px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.fas-lab-root .mini:hover {
+  background: #0d2c45;
+  border-color: #397298;
+  color: #fff;
+}
+
+.fas-lab-root .mini.active {
+  background: #087fb0;
+  border-color: #39d9ff;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(57, 217, 255, 0.3);
+}
+
+/* Video Camera Background */
+.fas-lab-root .camera {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+  transform: scaleX(-1);
+  z-index: 1;
+}
+
+.fas-lab-root .stage.cameraMode .camera {
+  display: block;
+}
+
+.fas-lab-root .stage.cameraMode .scene {
+  background: rgba(6, 17, 31, 0.5);
+}
+
+.fas-lab-root .cameraHelp {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  background: rgba(6, 17, 31, 0.9);
+  border: 1px solid #28516a;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  color: #cce9f7;
+  display: none;
+  z-index: 3;
+  max-width: 80%;
+  backdrop-filter: blur(4px);
+}
+
+.fas-lab-root .stage.cameraMode .cameraHelp {
+  display: block;
+}
+
+/* 3D Scene Container */
+.fas-lab-root .scene {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  perspective: 1000px;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.fas-lab-root .scene:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(26, 59, 74, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(26, 59, 74, 0.1) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(transparent, #000);
+  pointer-events: none;
+}
+
+.fas-lab-root .stage.cameraMode .scene:before {
+  display: none;
+}
+
+.fas-lab-root .boardWrap {
+  position: relative;
+  width: min(93%, 900px);
+  transform: rotateX(12deg) rotateZ(-1deg);
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease;
+}
+
+.fas-lab-root .boardWrap.no-tilt {
+  transform: rotateX(0deg) rotateZ(0deg) !important;
+}
+
+.fas-lab-root .stage.cameraMode .boardWrap {
+  transform: rotateX(0) rotateZ(0);
+  width: 86%;
+}
+
+/* Breadboard Body */
+.fas-lab-root .board {
+  position: relative;
+  aspect-ratio: 1.78;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #f7f4e8, #d4d8d5 70%, #9ea8ad);
+  box-shadow: 0 25px 40px rgba(0, 0, 0, 0.55), inset 0 3px 5px #fff, inset 0 -6px 8px #6b7880;
+  overflow: hidden;
+  border: 2px solid #aebac0;
+}
+
+.fas-lab-root .stage.cameraMode .board {
+  opacity: 0.82;
+}
+
+/* Power Rails */
+.fas-lab-root .rail {
+  position: absolute;
+  left: 3%;
+  right: 3%;
+  height: 5px;
+  border-radius: 5px;
+  opacity: 0.9;
+}
+
+.fas-lab-root .rail.red {
+  top: 9%;
+  background: #ef4d59;
+  box-shadow: 0 0 8px rgba(255, 83, 107, 0.4);
+}
+
+.fas-lab-root .rail.blue {
+  top: 13%;
+  background: #338bdf;
+}
+
+.fas-lab-root .rail.red.bottom {
+  top: auto;
+  bottom: 9%;
+}
+
+.fas-lab-root .rail.blue.bottom {
+  top: auto;
+  bottom: 13%;
+}
+
+/* Breadboard Tie-Point Holes */
+.fas-lab-root .holes {
+  position: absolute;
+  inset: 18% 3% 18%;
+  display: grid;
+  grid-template-columns: repeat(43, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 5px 3px;
+  pointer-events: none;
+}
+
+.fas-lab-root .hole {
+  align-self: center;
+  justify-self: center;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #7b8585;
+  box-shadow: inset 0 1px 2px #30383d, 0 1px 0 #fff;
+}
+
+.fas-lab-root .gap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 49%;
+  height: 3%;
+  background: #adb4b3;
+  box-shadow: inset 0 2px 3px #7d8586;
+}
+
+/* Dual In-line Package (DIP) IC Chips */
+.fas-lab-root .chip {
+  position: absolute;
+  top: 35%;
+  height: 25%;
+  width: 17%;
+  background: linear-gradient(100deg, #131a24, #303846 45%, #101720);
+  border: 2px solid #070b10;
+  border-radius: 6px;
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.45);
+  z-index: 2;
+  color: #d9e9ff;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: Consolas, monospace;
+  font-size: clamp(8px, 1.2vw, 13px);
+  font-weight: bold;
+  text-shadow: 0 1px 2px #000;
+  user-select: none;
+}
+
+.fas-lab-root .chip:before {
+  content: "";
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 0;
+  height: 4px;
+  background: #59616a;
+}
+
+.fas-lab-root .chip small {
+  font-size: 0.72em;
+  color: #91a9c0;
+  font-weight: normal;
+}
+
+.fas-lab-root .pins {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  height: 8px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.fas-lab-root .pins.top {
+  top: -7px;
+}
+
+.fas-lab-root .pins.bottom {
+  bottom: -7px;
+}
+
+.fas-lab-root .pins i {
+  width: 5px;
+  height: 10px;
+  background: linear-gradient(90deg, #7a818a, #e3e6e8, #737982);
+  border: 1px solid #4d535b;
+}
+
+.fas-lab-root .chip1 { left: 16%; }
+.fas-lab-root .chip2 { left: 41%; }
+.fas-lab-root .chip3 { left: 66%; }
+.fas-lab-root .chip4 {
+  left: 66%;
+  top: 65%;
+  height: 12%;
+  width: 15%;
+}
+
+/* Switch Units on Breadboard */
+.fas-lab-root .switchUnit {
+  position: absolute;
+  top: 15%;
+  width: 7%;
+  height: 20%;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #4b535c, #171e26, #4c555d);
+  border: 2px solid #8d989f;
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.45);
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.fas-lab-root .switchUnit:hover {
+  transform: scale(1.05);
+}
+
+.fas-lab-root .switchUnit .lever {
+  width: 8px;
+  height: 70%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #cbd4da, #4d5b68, #111820);
+  transform: rotate(-17deg);
+  box-shadow: 0 0 4px #000;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.fas-lab-root .switchUnit.on .lever {
+  transform: rotate(18deg);
+  background: linear-gradient(90deg, #e7fff8, #16a87d, #103d39);
+}
+
+.fas-lab-root .switchUnit:after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--fas-red);
+  box-shadow: 0 0 10px var(--fas-red);
+  transition: all 0.2s ease;
+}
+
+.fas-lab-root .switchUnit.on:after {
+  background: var(--fas-green);
+  box-shadow: 0 0 12px var(--fas-green);
+}
+
+.fas-lab-root .swA { left: 7%; }
+.fas-lab-root .swB { left: 29%; }
+.fas-lab-root .swC { left: 51%; }
+
+/* Input / Output Signal Labels on Board */
+.fas-lab-root .signalLabel {
+  position: absolute;
+  top: 4%;
+  font-weight: 800;
+  font-size: clamp(12px, 1.7vw, 18px);
+  color: #fff;
+  text-shadow: 0 2px 4px #000;
+  user-select: none;
+}
+
+.fas-lab-root .la { left: 8%; }
+.fas-lab-root .lb { left: 30%; }
+.fas-lab-root .lc { left: 51%; }
+
+.fas-lab-root .outputLabel {
+  position: absolute;
+  top: 7%;
+  font-weight: 800;
+  font-size: clamp(11px, 1.5vw, 16px);
+  color: white;
+  text-align: center;
+  user-select: none;
+}
+
+.fas-lab-root .lo1 { left: 77%; }
+.fas-lab-root .lo2 { left: 89%; }
+
+/* Output LED & Resistor Assemblies */
+.fas-lab-root .ledAssembly {
+  position: absolute;
+  top: 17%;
+  width: 4%;
+  height: 14%;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.fas-lab-root .ledAssembly.one { left: 79%; }
+.fas-lab-root .ledAssembly.two { left: 91%; }
+
+.fas-lab-root .ledBulb {
+  width: 100%;
+  aspect-ratio: 0.72;
+  border-radius: 50% 50% 38% 38%;
+  background: #3c2029;
+  border: 2px solid #9d5861;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.fas-lab-root .ledBulb:after {
+  content: "";
+  position: absolute;
+  bottom: -7px;
+  left: 36%;
+  height: 9px;
+  width: 28%;
+  background: #8a9ba7;
+}
+
+.fas-lab-root .ledBulb.on.red {
+  background: #ff263e;
+  border-color: #ffb1b7;
+  box-shadow: 0 0 10px #ff1d3b, 0 0 27px rgba(255, 29, 59, 0.6);
+}
+
+.fas-lab-root .ledBulb.on.green {
+  background: #00f39b;
+  border-color: #b7ffe5;
+  box-shadow: 0 0 10px #00f39b, 0 0 28px rgba(0, 243, 155, 0.6);
+}
+
+.fas-lab-root .resistor {
+  width: 55%;
+  height: 16px;
+  border-radius: 4px;
+  background: repeating-linear-gradient(90deg, #bb7b43 0 5px, #533b2a 5px 7px, #d5a267 7px 13px);
+  margin-top: 7px;
+}
+
+/* Breadboard Signal Wires & Particles */
+.fas-lab-root .wires {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: visible;
+}
+
+.fas-lab-root .wire {
+  fill: none;
+  stroke-width: 1.1;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+
+.fas-lab-root .wire.red { stroke: #fa4c5f; }
+.fas-lab-root .wire.yellow { stroke: #ffc857; }
+.fas-lab-root .wire.blue { stroke: #478fff; }
+.fas-lab-root .wire.green { stroke: #1df4a1; }
+.fas-lab-root .wire.cyan { stroke: #35dcff; }
+
+.fas-lab-root .particle {
+  fill: #fff;
+  transition: opacity 0.2s ease;
+}
+
+.fas-lab-root .particle.red { fill: #ff5269; }
+.fas-lab-root .particle.yellow { fill: #ffd65c; }
+.fas-lab-root .particle.green { fill: #42ffb4; }
+.fas-lab-root .particle.blue { fill: #5ba6ff; }
+
+.fas-lab-root .boardCaption {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  color: #b4d4e6;
+  z-index: 3;
+  text-shadow: 0 1px 4px #000;
+  pointer-events: none;
+}
+
+/* Toast Notification */
+.fas-lab-root .toast {
+  position: absolute;
+  bottom: 42px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 9px;
+  background: rgba(7, 21, 35, 0.94);
+  border: 1px solid #2e6c83;
+  color: #c9f6ff;
+  z-index: 10;
+  font-size: 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  animation: fasFadeIn 0.2s ease;
+}
+
+@keyframes fasFadeIn {
+  from { opacity: 0; transform: translate(-50%, 6px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Subpanels Below Stage */
+.fas-lab-root .below {
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.fas-lab-root .subpanel {
+  padding: 14px;
+}
+
+.fas-lab-root .subpanel h3,
+.fas-lab-root .panel h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.fas-lab-root .equation {
+  font-family: Consolas, monospace;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #061321;
+  border: 1px solid #1e3e55;
+  margin: 6px 0;
+  color: #d7f6ff;
+  word-break: break-word;
+}
+
+.fas-lab-root .legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  color: var(--fas-muted);
+  font-size: 11px;
+}
+
+.fas-lab-root .dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.fas-lab-root .muted {
+  color: var(--fas-muted);
+  font-size: 12px;
+  margin: 6px 0;
+}
+
+/* Schematic SVG Diagram */
+.fas-lab-root .schematic {
+  width: 100%;
+  height: auto;
+  background: #061522;
+  border: 1px solid var(--fas-line);
+  border-radius: 10px;
+  display: block;
+}
+
+.fas-lab-root .schematic text {
+  font-size: 12px;
+  fill: #dff8ff;
+  font-weight: 600;
+  font-family: Consolas, monospace;
+}
+
+.fas-lab-root .gateRect {
+  fill: #0b344b;
+  stroke: #29cfff;
+  stroke-width: 2;
+}
+
+.fas-lab-root .schemwire {
+  fill: none;
+  stroke: #22efa2;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: opacity 0.2s ease, stroke 0.2s ease;
+}
+
+/* Component Inventory Grid */
+.fas-lab-root .components {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.fas-lab-root .component {
+  background: #061522;
+  border: 1px solid #1b3c52;
+  border-radius: 8px;
+  padding: 9px 8px;
+  text-align: center;
+  font-size: 11px;
+  color: #c2d9e9;
+}
+
+.fas-lab-root .component b {
+  display: block;
+  color: var(--fas-cyan);
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+/* Bottom 3-Card Grid */
+.fas-lab-root .bottomGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Right Control Column */
+.fas-lab-root .right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fas-lab-root .right .panel {
+  padding: 14px;
+}
+
+.fas-lab-root .right h2 {
+  font-size: 15px;
+  margin: 0 0 10px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.fas-lab-root .controlrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 9px 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Sliding Toggle Switches */
+.fas-lab-root .toggle {
+  width: 48px;
+  height: 25px;
+  border: 1px solid #36546a;
+  border-radius: 99px;
+  background: #203448;
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.fas-lab-root .toggle:after {
+  content: "";
+  width: 17px;
+  height: 17px;
+  background: #8ba5ba;
+  border-radius: 50%;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.fas-lab-root .toggle.on {
+  background: #067b5b;
+  border-color: #10a37f;
+}
+
+.fas-lab-root .toggle.on:after {
+  transform: translateX(22px);
+  background: #eafff7;
+}
+
+.fas-lab-root .bitvalue {
+  font-weight: 800;
+  color: var(--fas-cyan);
+  width: 22px;
+  font-size: 15px;
+  text-align: center;
+}
+
+/* Output Indicators */
+.fas-lab-root .outrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 13px;
+}
+
+.fas-lab-root .lamp {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3d2630;
+  border: 1px solid #81505b;
+  transition: all 0.2s ease;
+}
+
+.fas-lab-root .lamp.on.red {
+  background: #ff314b;
+  border-color: #ff9da8;
+  box-shadow: 0 0 13px #ff314b;
+}
+
+.fas-lab-root .lamp.on.green {
+  background: #00ef98;
+  border-color: #a4ffdc;
+  box-shadow: 0 0 13px #00ef98;
+}
+
+.fas-lab-root .outrow strong {
+  margin-left: auto;
+  font-size: 18px;
+  font-family: Consolas, monospace;
+  color: #fff;
+}
+
+/* Truth Table */
+.fas-lab-root .tablewrap {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #1d3a51;
+}
+
+.fas-lab-root table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fas-lab-root td,
+.fas-lab-root th {
+  padding: 6px 5px;
+  text-align: center;
+  border-bottom: 1px solid #1d3a51;
+}
+
+.fas-lab-root th {
+  color: #9fc0d5;
+  background: #081a2b;
+  font-weight: 600;
+}
+
+.fas-lab-root tr.current {
+  background: #07563f;
+  color: #fff;
+  font-weight: bold;
+}
+
+.fas-lab-root tr.current td {
+  color: #72ffcf;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 1100px) {
+  .fas-lab-root .lab-header {
+    flex-wrap: wrap;
+  }
+  .fas-lab-root .modeTabs {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+  .fas-lab-root .viewTabs {
+    margin-left: auto;
+  }
+  .fas-lab-root .lab-main {
+    grid-template-columns: 1fr 280px;
+  }
+  .fas-lab-root .sideNav {
+    display: none;
+  }
+  .fas-lab-root .center {
+    grid-column: 1;
+  }
+  .fas-lab-root .right {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .fas-lab-root .below {
+    grid-template-columns: 1fr;
+  }
+  .fas-lab-root .bottomGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .fas-lab-root .lab-header {
+    position: static;
+  }
+  .fas-lab-root .brand {
+    flex: 1;
+  }
+  .fas-lab-root .viewTabs {
+    width: 100%;
+    justify-content: center;
+  }
+  .fas-lab-root .viewTabs button {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .fas-lab-root .modeTabs button {
+    flex: 1;
+    padding: 9px 8px;
+    font-size: 12px;
+  }
+  .fas-lab-root .lab-main {
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+  }
+  .fas-lab-root .stage {
+    min-height: 330px;
+    height: 72vw;
+    max-height: 460px;
+  }
+  .fas-lab-root .right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .fas-lab-root .right .truthPanel {
+    grid-column: 1 / -1;
+  }
+  .fas-lab-root .bottomGrid {
+    grid-template-columns: 1fr;
+  }
+  .fas-lab-root .boardWrap {
+    width: 98%;
+  }
+  .fas-lab-root .holes {
+    gap: 4px 2px;
+  }
+  .fas-lab-root .hole {
+    width: 3px;
+    height: 3px;
+  }
+  .fas-lab-root .switchUnit {
+    height: 17%;
+  }
+  .fas-lab-root .chip {
+    font-size: 8px;
+  }
+  .fas-lab-root .ledAssembly {
+    width: 4.5%;
+  }
+  .fas-lab-root .stageTools {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .fas-lab-root .boardCaption {
+    font-size: 9px;
+  }
+}

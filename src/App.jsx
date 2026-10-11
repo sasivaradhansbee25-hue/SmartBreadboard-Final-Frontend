@@ -17,6 +17,7 @@ import MobileScanner from './pages/MobileScanner';
 import CircuitDiagramAR from './pages/CircuitDiagramAR';
 import HardwareMonitor from './pages/HardwareMonitor';
 import ClipperClamperLab from './pages/ClipperClamperLab';
+import FullAdderSubtractorLab from './pages/FullAdderSubtractorLab';
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
                 <Route path="/hardware-monitor" element={<HardwareMonitor />} />
                 <Route path="/dc-motor-monitor" element={<HardwareMonitor />} />
                 <Route path="/clipper-clamper-lab" element={<ClipperClamperLab />} />
+                <Route path="/full-adder-subtractor-lab" element={<FullAdderSubtractorLab />} />
                 <Route path="/analysis" element={<Analysis />} />
                 <Route path="/simulator" element={<Simulator />} />
                 <Route path="/calculator" element={<Calculator />} />

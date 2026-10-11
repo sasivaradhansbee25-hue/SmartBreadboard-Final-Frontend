@@ -134,6 +134,7 @@ body {
 .nav-links {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.4rem;
   list-style: none;
 }
